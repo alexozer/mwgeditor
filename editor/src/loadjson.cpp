@@ -98,16 +98,17 @@ LevelModel loadJsonLevel(std::string filename)
         PlanetModel planet = loadJsonPlanet(planetJsonItem.value(), texTable);
         if (planetJsonItem.key() == "startPlanet")
         {
-            levelModel.startPlanet = planet;
+            planet.order = PlanetOrder::START;
         }
         else if (planetJsonItem.key() == "endPlanet")
         {
-            levelModel.endPlanet = planet;
+            planet.order = PlanetOrder::END;
         }
         else
         {
-            levelModel.planets.emplace_back(planet);
+            planet.order = PlanetOrder::MIDDLE;
         }
+        levelModel.planets.emplace_back(planet);
     }
 
     // Load foods

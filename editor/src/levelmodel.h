@@ -5,6 +5,8 @@
 
 #include <vector>
 
+enum class PlanetOrder { START, MIDDLE, END };
+
 struct ObjectModel
 {
     Texture tex;
@@ -17,6 +19,7 @@ struct PlanetModel : public ObjectModel
 {
     bool isSun;
     bool hasFood;
+    PlanetOrder order;
 };
 
 struct FoodModel : public ObjectModel
@@ -28,8 +31,6 @@ struct FoodModel : public ObjectModel
 struct LevelModel {
     int levelNumber;
 
-    PlanetModel startPlanet;
-    PlanetModel endPlanet;
     std::vector<PlanetModel> planets;
 
     std::vector<FoodModel> foods;

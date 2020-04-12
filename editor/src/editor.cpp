@@ -99,6 +99,15 @@ static void showLevelVisualization()
         drawList->AddLine(p1, p2, color);
     }
 
+    // Draw planets
+    for (auto& planet : level.planets)
+    {
+        ImVec2 vizPos = worldToVizSpace(planet.pos);
+
+        ImVec2 uv0(0, 0);
+        ImVec2 uv1(1, 1);
+    }
+
 //    ImVec2 uv0(0, 0);
 //    ImVec2 uv1(0.5, 1);
 //    drawList->AddImage(texture.id,
