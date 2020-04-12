@@ -9,6 +9,7 @@ include_directories(libs/imgui/misc/cpp)
 include_directories(libs/imgui/misc/freetype)
 include_directories(libs/imgui/misc/single_file)
 include_directories(libs/stb)
+include_directories(libs/json)
 include_directories(/usr/include/SDL2) # Probably only works on Linux, TODO fix
 
 add_executable(editor
@@ -26,5 +27,5 @@ add_executable(editor
         libs/imgui/imgui_widgets.cpp
         libs/imgui/imstb_rectpack.h
         libs/imgui/imstb_textedit.h
-        libs/imgui/imstb_truetype.h src/editor.cpp src/editor.h libs/stb/stb_image.h src/textures.cpp src/textures.h src/levelmodel.h)
+        libs/imgui/imstb_truetype.h src/editor.cpp src/editor.h libs/stb/stb_image.h src/textures.cpp src/textures.h src/levelmodel.h src/loadjson.cpp src/loadjson.h)
 

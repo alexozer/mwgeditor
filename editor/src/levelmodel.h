@@ -26,9 +26,13 @@ struct FoodModel : public ObjectModel
 };
 
 struct LevelModel {
+    int levelNumber;
+
     PlanetModel startPlanet;
     PlanetModel endPlanet;
     std::vector<PlanetModel> planets;
+
+    std::vector<FoodModel> foods;
 
     ObjectModel player;
     ObjectModel customer;
