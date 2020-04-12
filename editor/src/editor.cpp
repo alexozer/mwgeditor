@@ -61,10 +61,11 @@ public:
         return vizToWorldSpace(screenToVizSpace(screenPos));
     }
 
-    void setWorldPos(ImVec2 worldPos)
-    {
-        m_worldPos = worldPos;
-    }
+    ImVec2 getWorldPos() const { return m_worldPos; }
+
+    void setWorldPos(ImVec2 worldPos) { m_worldPos = worldPos; }
+
+    const Canvas &getCanvas() const { return m_canvas; }
 
 private:
     float m_zoom;
@@ -88,12 +89,29 @@ static void showHelp()
     ImGui::End();
 }
 
-static void showLevelVisualization()
+static void showLevelPlanets(ImDrawList *drawList)
 {
-    ImGui::Begin("Level Visualization");
+    for (auto& planet : level.planets)
+    {
+        float scaledWidth = planet.tex.width * planet.scale / 2;
+        float scaledHeight = planet.tex.height * planet.scale;
 
-    ImDrawList* drawList = ImGui::GetWindowDrawList();
+        ImVec2 worldTexStart(planet.pos.x - scaledWidth / 2,
+                             planet.pos.y - scaledHeight / 2);
+        ImVec2 worldTexEnd(planet.pos.x + scaledWidth / 2,
+                           planet.pos.y + scaledHeight / 2);
 
+        ImVec2 screenStart = viz.worldToScreenSpace(worldTexStart);
+        ImVec2 screenEnd = viz.worldToScreenSpace(worldTexEnd);
+
+        ImVec2 uv0(0, 0);
+        ImVec2 uv1(0.5, 1);
+
+        drawList->AddImage(planet.tex.id, screenStart, screenEnd, uv0, uv1);
+    }
+}
+
+static void showLevelGrid(ImDrawList *drawList) {
 //    Canvas canvas = generateWindowCanvas();
 //
 //    ImGui::InvisibleButton("canvas", canvas.size);
@@ -149,27 +167,43 @@ static void showLevelVisualization()
 //        ImU32 color = IM_COL32(50, 50, 50, 255);
 //        drawList->AddLine(p1, p2, color);
 //    }
+}
+
+static void handleDragging()
+{
+    ImGui::InvisibleButton("canvas", viz.getCanvas().size);
+
+    static bool isDraggingSpace = false;
+    static ImVec2 mouseDownScreenPos;
+    static ImVec2 oldVizWorldPos;
+
+    ImVec2 currMouseScreenPos = ImGui::GetIO().MousePos;
+
+    if (ImGui::IsItemHovered() && !isDraggingSpace && ImGui::IsMouseClicked(0))
+    {
+        isDraggingSpace = true;
+        mouseDownScreenPos = currMouseScreenPos;
+        oldVizWorldPos = viz.getWorldPos();
+    }
+    if (isDraggingSpace)
+    {
+        viz.setWorldPos(ImVec2(oldVizWorldPos.x + mouseDownScreenPos.x - currMouseScreenPos.x,
+                               oldVizWorldPos.y + mouseDownScreenPos.y - currMouseScreenPos.y));
+        if (!ImGui::IsMouseDown(0)) isDraggingSpace = false;
+    }
+}
+
+static void showLevelVisualization()
+{
+    ImGui::Begin("Level Visualization");
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     viz.generateWindowCanvas();
 
-    for (auto& planet : level.planets)
-    {
-        float scaledWidth = planet.tex.width * planet.scale / 2;
-        float scaledHeight = planet.tex.height * planet.scale;
-
-        ImVec2 worldTexStart(planet.pos.x - scaledWidth / 2,
-                planet.pos.y - scaledHeight / 2);
-        ImVec2 worldTexEnd(planet.pos.x + scaledWidth / 2,
-                planet.pos.y + scaledHeight / 2);
-
-        ImVec2 screenStart = viz.vizToScreenSpace(viz.worldToVizSpace(worldTexStart));
-        ImVec2 screenEnd = viz.vizToScreenSpace(viz.worldToVizSpace(worldTexEnd));
-
-        ImVec2 uv0(0, 0);
-        ImVec2 uv1(0.5, 1);
-
-        drawList->AddImage(planet.tex.id, screenStart, screenEnd, uv0, uv1);
-    }
+    handleDragging();
+    showLevelGrid(drawList);
+    showLevelPlanets(drawList);
 
     ImGui::End();
 }
