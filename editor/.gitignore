@@ -1,4 +1,4 @@
-/editor
+/mwgeditor
 *.o
 /cmake-build-debug/
 /imgui.ini
