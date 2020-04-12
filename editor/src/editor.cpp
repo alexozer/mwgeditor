@@ -1,5 +1,6 @@
 #include "editor.h"
 #include "textures.h"
+#include "loadjson.h"
 
 #include "imgui.h"
 
@@ -159,7 +160,10 @@ void initEditor()
     bool ret = loadTextureFromFile("../assets/textures/planet1.png", texture);
     IM_ASSERT(ret);
 
+    viz.pos = ImVec2();
     viz.zoom = 1;
+
+    loadJsonLevel("examples/level1.json");
 }
 
 void runEditor()
