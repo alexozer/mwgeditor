@@ -1,0 +1,279 @@
+{
+    "textures": {
+        "ship": {
+            "file":   "textures/ship.png"
+        },
+        "ships": {
+            "file":   "textures/ships.png"
+        },
+        "space": {
+            "file":  "textures/background_v1.png",
+            "wrapS": "repeat",
+            "wrapT": "repeat"
+        },
+        "range": {
+            "file":  "textures/range.png"
+        },
+        "sun": {
+            "file":  "textures/sun.png"
+        },
+        "planet1": {
+            "file":   "textures/planet1.png"
+        },
+        "planet2": {
+            "file":   "textures/planet2.png"
+        },
+        "planet3": {
+            "file":   "textures/planet3.png"
+        },
+        "steak": {
+            "file": "textures/steak_animation.png"
+        },
+        "bun": {
+            "file": "textures/bun.png"
+        }
+    },
+    "fonts": {
+        "felt32": {
+            "file":     "fonts/MarkerFelt.ttf",
+            "size":     32
+        }
+    },
+    "scenes": {
+        "lv1": {
+            "type": "Node",
+            
+            "children": {
+                "background": {
+                    "type": "Image",
+                        "data": {
+                            "texture":  "space",
+                            "position": [0, 0],
+                            "scale":    0.5,
+                            "polygon":  [0,0,0,2540,2540,2540,4500,2540,4500,0,0,0],
+                            "anchor":   [0.5,0.5]
+                    }
+                },
+                "game": {
+                    "type": "Node",
+                    "data": {
+                        "size":     [2560,2560],
+                        "position": [1280,1280],
+                        "anchor":   [0.5,0.5]
+                    },
+                    "children": {
+                        "numPlanets": {
+                            "type": "Node",
+                            "data": {
+                                "num": 3
+                            }
+                        },
+                        "numFood": {
+                            "type": "Node",
+                            "data": {
+                                "num": 2
+                            }
+                        },
+                        "planets": {
+                            "type": "Node",
+                            "children": {
+                                "startPlanet": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "planet2",
+                                        "cols":     2,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [200, 200],
+                                        "scale":    0.3,
+                                        "hasFood": false,
+                                        "isSun":    false
+                                    }
+                                },
+                           
+                                "planet1": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "planet1",
+                                        "cols":     2,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [400, 450],
+                                        "scale":    0.3,
+                                        "hasFood": true,
+                                        "isSun":    false
+                                    }
+                                },
+                           
+                                "planet2": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "planet1",
+                                        "cols":     2,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [650, 185],
+                                        "scale":    0.5,
+                                        "hasFood": true,
+                                        "isSun":    false
+                                        
+                                    }
+                                },
+                           
+                                "planet3": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "sun",
+                                        "cols":     2,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [800, 600],
+                                        "scale":    0.4,
+                                        "isSun":    true,
+                                        "hasFood": false
+                                    }
+                                },
+                            
+                            
+                                "endPlanet": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "planet3",
+                                        "cols":     2,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [1400, 400],
+                                        "scale":    0.3,
+                                        "isSun":    false,
+                                        "hasFood": false
+                                    }
+                                }
+                            
+                            }
+                        },
+                        "planetRanges": {
+                            "type": "Node",
+                            "children": {
+                                "startPlanetRange": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "range",
+                                        "cols":     5,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [200, 200],
+                                        "scale":    0.9
+                                    }
+                                },
+                                
+                                "planet1Range": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "range",
+                                        "cols":     5,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [400, 450],
+                                        "scale":    0.9
+                                    }
+                                },
+                                
+                                "planet2Range": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "range",
+                                        "cols":     5,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [650, 185],
+                                        "scale":    1.5
+                                    }
+                                },
+                                
+                                "planet3Range": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "range",
+                                        "cols":     5,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [800, 600],
+                                        "scale":    1.2
+                                    }
+                                },
+                                
+                                
+                                "endPlanetRange": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "range",
+                                        "cols":     5,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [1400, 400],
+                                        "scale":    0.9
+                                    }
+                                }
+                            }
+                        },
+                        "player": {
+                            "type": "Animation",
+                            "data": {
+                                "texture":  "ship",
+                                "cols":     2,
+                                "frame":    0,
+                                "position": [375,375],
+                                "velocity": [0,0],
+                                "scale": 0.75,
+                                "anchor":   [0.5,0.5]
+                            }
+                        },
+                        "food": {
+                            "type": "Node",
+                            "children": {
+                                "food1": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "bun",
+                                        "cols":     1,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [800, 250],
+                                        "scale":    [0.1,0.1],
+                                        "cookable": false
+                                    }
+                                },
+                        
+                                "food2": {
+                                    "type": "Animation",
+                                    "data": {
+                                        "texture":  "steak",
+                                        "cols":     7,
+                                        "frame":    0,
+                                        "anchor":   [0.5, 0.5],
+                                        "position": [500, 500],
+                                        "scale":    [1,1],
+                                        "cookable": true
+                                    }
+                                }
+                            }
+                        },
+                        "customer": {
+                            "type": "Animation",
+                            "data": {
+                                "texture":  "ships",
+                                "span":     18,
+                                "cols":     5,
+                                "frame":    9,
+                                "position": [1400,475],
+                                "scale": [1, 1],
+                                "anchor":   [0.5,0.5]
+                            }
+                        }
+                       
+                    }
+                }
+            }
+        }
+    }
+}
