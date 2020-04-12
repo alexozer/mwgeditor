@@ -4,24 +4,77 @@
 
 #include "imgui.h"
 
-struct VisualizationModel
+struct Canvas
 {
-    float zoom;
-    ImVec2 pos;
+    ImVec2 start;
+    ImVec2 end;
+    ImVec2 size;
+};
+
+class VisualizationModel
+{
+public:
+    VisualizationModel(): m_zoom{1} {}
+
+    void generateWindowCanvas()
+    {
+        ImVec2 canvasStart = ImGui::GetCursorScreenPos();
+        ImVec2 canvasSize = ImGui::GetContentRegionAvail();
+        ImVec2 canvasEnd(canvasStart.x + canvasSize.x, canvasStart.y + canvasSize.y);
+
+        m_canvas = Canvas{canvasStart, canvasEnd, canvasSize};
+    }
+
+    ImVec2 vizToWorldSpace(ImVec2 vizPos) const
+    {
+        return ImVec2(vizPos.x + m_worldPos.x, vizPos.y + m_worldPos.y);
+    }
+
+    ImVec2 worldToVizSpace(ImVec2 worldPos) const
+    {
+        return ImVec2(worldPos.x - m_worldPos.x, worldPos.y - m_worldPos.y);
+    }
+
+    ImVec2 vizToScreenSpace(ImVec2 vizPos) const
+    {
+        ImVec2 center(m_canvas.start.x + m_canvas.size.x / 2,
+                m_canvas.start.y + m_canvas.size.y / 2);
+        ImVec2 screenPos(center.x + vizPos.x, center.y + vizPos.y);
+        return screenPos;
+    }
+
+    ImVec2 screenToVizSpace(ImVec2 screenPos) const
+    {
+        ImVec2 center(m_canvas.start.x + m_canvas.size.x / 2,
+                      m_canvas.start.y + m_canvas.size.y / 2);
+        ImVec2 vizPos(screenPos.x - center.x, screenPos.y - center.y);
+        return vizPos;
+    }
+
+    ImVec2 worldToScreenSpace(ImVec2 worldPos) const
+    {
+        return vizToScreenSpace(worldToVizSpace(worldPos));
+    }
+
+    ImVec2 screenToWorldSpace(ImVec2 screenPos) const
+    {
+        return vizToWorldSpace(screenToVizSpace(screenPos));
+    }
+
+    void setWorldPos(ImVec2 worldPos)
+    {
+        m_worldPos = worldPos;
+    }
+
+private:
+    float m_zoom;
+    ImVec2 m_worldPos; // Position of "camera" in world space
+    Canvas m_canvas;
+
 };
 
 static LevelModel level = {};
 static VisualizationModel viz = {};
-
-static ImVec2 vizToWorldSpace(ImVec2 pos)
-{
-    return ImVec2(pos.x + viz.pos.x, pos.y + viz.pos.y);
-}
-
-static ImVec2 worldToVizSpace(ImVec2 pos)
-{
-    return ImVec2(pos.x - viz.pos.x, pos.y - viz.pos.y);
-}
 
 static void showHelp()
 {
@@ -41,83 +94,81 @@ static void showLevelVisualization()
 
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-    ImVec2 canvasStart = ImGui::GetCursorScreenPos();
-    ImVec2 canvasSize = ImGui::GetContentRegionAvail();
-    ImVec2 canvasEnd(canvasStart.x + canvasSize.x, canvasStart.y + canvasSize.y);
+//    Canvas canvas = generateWindowCanvas();
+//
+//    ImGui::InvisibleButton("canvas", canvas.size);
+//    ImVec2 mousePosInCanvas = ImVec2(ImGui::GetIO().MousePos.x - canvas.start.x, ImGui::GetIO().MousePos.y - canvas.end.y);
+//
+//    static bool isDraggingSpace = false;
+//    static ImVec2 mouseDownVizPos;
+//    static ImVec2 mouseDownPos;
+//
+//    if (ImGui::IsItemHovered() && !isDraggingSpace && ImGui::IsMouseClicked(0)) {
+//        isDraggingSpace = true;
+//        mouseDownVizPos = viz.pos;
+//        mouseDownPos = mousePosInCanvas;
+//    }
+//
+//    if (isDraggingSpace)
+//    {
+//        viz.pos = ImVec2(mouseDownVizPos.x - (mousePosInCanvas.x - mouseDownPos.x),
+//                         mouseDownVizPos.y - (mousePosInCanvas.y - mouseDownPos.y));
+//        if (!ImGui::IsMouseDown(0)) isDraggingSpace = false;
+//    }
+//
+//    ImVec2 worldStart = vizToWorldSpace(ImVec2());
+//    ImVec2 worldEnd = vizToWorldSpace(canvasSize);
+//
+//    worldStart.x = static_cast<int>(worldStart.x / 100) * 100;
+//    worldStart.y = static_cast<int>(worldStart.y / 100) * 100;
+//
+//    for (float x = worldStart.x; x < worldEnd.x; x += 100)
+//    {
+//        ImVec2 p1 = worldToVizSpace(ImVec2(x, 0));
+//        p1.x += canvasStart.x;
+//        p1.y = canvasStart.y;
+//
+//        ImVec2 p2 = worldToVizSpace(ImVec2(x, 0));
+//        p2.x += canvasStart.x;
+//        p2.y = canvasEnd.y;
+//
+//        ImU32 color = IM_COL32(50, 50, 50, 255);
+//        drawList->AddLine(p1, p2, color);
+//    }
+//
+//    for (float y = worldStart.y; y < worldEnd.y; y += 100)
+//    {
+//        ImVec2 p1 = worldToVizSpace(ImVec2(0, y));
+//        p1.x = canvasStart.x;
+//        p1.y += canvasStart.y;
+//
+//        ImVec2 p2 = worldToVizSpace(ImVec2(0, y));
+//        p2.x = canvasEnd.x;
+//        p2.y += canvasStart.y;
+//
+//        ImU32 color = IM_COL32(50, 50, 50, 255);
+//        drawList->AddLine(p1, p2, color);
+//    }
 
-    ImGui::InvisibleButton("canvas", canvasSize);
-    ImVec2 mousePosInCanvas = ImVec2(ImGui::GetIO().MousePos.x - canvasStart.x, ImGui::GetIO().MousePos.y - canvasEnd.y);
+    viz.generateWindowCanvas();
 
-    static bool isDraggingSpace = false;
-    static ImVec2 mouseDownVizPos;
-    static ImVec2 mouseDownPos;
-
-    if (ImGui::IsItemHovered() && !isDraggingSpace && ImGui::IsMouseClicked(0)) {
-        isDraggingSpace = true;
-        mouseDownVizPos = viz.pos;
-        mouseDownPos = mousePosInCanvas;
-    }
-
-    if (isDraggingSpace)
-    {
-        viz.pos = ImVec2(mouseDownVizPos.x - (mousePosInCanvas.x - mouseDownPos.x),
-                         mouseDownVizPos.y - (mousePosInCanvas.y - mouseDownPos.y));
-        if (!ImGui::IsMouseDown(0)) isDraggingSpace = false;
-    }
-
-    ImVec2 worldStart = vizToWorldSpace(ImVec2());
-    ImVec2 worldEnd = vizToWorldSpace(canvasSize);
-
-    worldStart.x = static_cast<int>(worldStart.x / 100) * 100;
-    worldStart.y = static_cast<int>(worldStart.y / 100) * 100;
-
-    for (float x = worldStart.x; x < worldEnd.x; x += 100)
-    {
-        ImVec2 p1 = worldToVizSpace(ImVec2(x, 0));
-        p1.x += canvasStart.x;
-        p1.y = canvasStart.y;
-
-        ImVec2 p2 = worldToVizSpace(ImVec2(x, 0));
-        p2.x += canvasStart.x;
-        p2.y = canvasEnd.y;
-
-        ImU32 color = IM_COL32(50, 50, 50, 255);
-        drawList->AddLine(p1, p2, color);
-    }
-
-    for (float y = worldStart.y; y < worldEnd.y; y += 100)
-    {
-        ImVec2 p1 = worldToVizSpace(ImVec2(0, y));
-        p1.x = canvasStart.x;
-        p1.y += canvasStart.y;
-
-        ImVec2 p2 = worldToVizSpace(ImVec2(0, y));
-        p2.x = canvasEnd.x;
-        p2.y += canvasStart.y;
-
-        ImU32 color = IM_COL32(50, 50, 50, 255);
-        drawList->AddLine(p1, p2, color);
-    }
-
-    // Draw planets
     for (auto& planet : level.planets)
     {
-        ImVec2 vizCenter = worldToVizSpace(planet.pos);
-
-        float scaledWidth = planet.tex.width * planet.scale;
+        float scaledWidth = planet.tex.width * planet.scale / 2;
         float scaledHeight = planet.tex.height * planet.scale;
 
-        // Assume anchor is (0.5, 0.5)
-        ImVec2 vizStart, vizEnd;
-        vizStart.x = vizCenter.x - scaledWidth / 4;
-        vizStart.y = vizCenter.y - scaledHeight / 2;
-        vizEnd.x = vizCenter.x + scaledWidth / 4;
-        vizEnd.y = vizCenter.y + scaledHeight / 2;
+        ImVec2 worldTexStart(planet.pos.x - scaledWidth / 2,
+                planet.pos.y - scaledHeight / 2);
+        ImVec2 worldTexEnd(planet.pos.x + scaledWidth / 2,
+                planet.pos.y + scaledHeight / 2);
+
+        ImVec2 screenStart = viz.vizToScreenSpace(viz.worldToVizSpace(worldTexStart));
+        ImVec2 screenEnd = viz.vizToScreenSpace(viz.worldToVizSpace(worldTexEnd));
 
         ImVec2 uv0(0, 0);
         ImVec2 uv1(0.5, 1);
 
-        drawList->AddImage(planet.tex.id, vizStart, vizEnd, uv0, uv1);
+        drawList->AddImage(planet.tex.id, screenStart, screenEnd, uv0, uv1);
     }
 
     ImGui::End();
@@ -172,9 +223,17 @@ static void showDemoStuff()
 
 void initEditor()
 {
-    viz.pos = ImVec2();
-    viz.zoom = 1;
     level = loadJsonLevel("examples/level1.json");
+
+    // Initially center on the start planet
+    // Or else the initial position is (0, 0) I guess
+    for (auto& planet : level.planets)
+    {
+        if (planet.order == PlanetOrder::START)
+        {
+            viz.setWorldPos(planet.pos);
+        }
+    }
 }
 
 void runEditor()

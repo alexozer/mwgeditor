@@ -165,7 +165,7 @@ void ImGui::ShowUserGuide()
     ImGui::BulletText("CTRL+Click on a slider or drag box to input value as text.");
     ImGui::BulletText("TAB/SHIFT+TAB to cycle through keyboard editable fields.");
     if (io.FontAllowUserScaling)
-        ImGui::BulletText("CTRL+Mouse Wheel to zoom window contents.");
+        ImGui::BulletText("CTRL+Mouse Wheel to m_zoom window contents.");
     ImGui::BulletText("While inputing text:\n");
     ImGui::Indent();
     ImGui::BulletText("CTRL+Left/Right to word jump.");
