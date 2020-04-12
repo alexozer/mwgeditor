@@ -111,6 +111,29 @@ static void showLevelPlanets(ImDrawList *drawList)
     }
 }
 
+// TODO deduplicate with drawing planets, customers, etc?
+static void showLevelFoods(ImDrawList *drawList)
+{
+    for (auto& food : level.foods)
+    {
+        float scaledWidth = food.tex.width * food.scale / food.cols;
+        float scaledHeight = food.tex.height * food.scale;
+
+        ImVec2 worldTexStart(food.pos.x - scaledWidth / 2,
+                             food.pos.y - scaledHeight / 2);
+        ImVec2 worldTexEnd(food.pos.x + scaledWidth / 2,
+                           food.pos.y + scaledHeight / 2);
+
+        ImVec2 screenStart = viz.worldToScreenSpace(worldTexStart);
+        ImVec2 screenEnd = viz.worldToScreenSpace(worldTexEnd);
+
+        ImVec2 uv0(0, 0);
+        ImVec2 uv1(1.f / food.cols, 1);
+
+        drawList->AddImage(food.tex.id, screenStart, screenEnd, uv0, uv1);
+    }
+}
+
 static void showLevelGrid(ImDrawList *drawList) {
     ImVec2 worldStart = viz.screenToWorldSpace(viz.getCanvas().start);
     ImVec2 worldEnd = viz.screenToWorldSpace(viz.getCanvas().end);
@@ -180,6 +203,7 @@ static void showLevelVisualization()
     handleDragging();
     showLevelGrid(drawList);
     showLevelPlanets(drawList);
+    showLevelFoods(drawList);
 
     ImGui::End();
 }
