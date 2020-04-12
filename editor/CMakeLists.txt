@@ -11,7 +11,7 @@ include_directories(libs/imgui/misc/single_file)
 include_directories(/usr/include/SDL2) # Probably only works on Linux, TODO fix
 
 add_executable(editor
-        main.cpp
+        src/main.cpp
         libs/imgui/examples/imgui_impl_opengl3.cpp
         libs/imgui/examples/imgui_impl_opengl3.h
         libs/imgui/misc/cpp/imgui_stdlib.cpp
@@ -25,5 +25,5 @@ add_executable(editor
         libs/imgui/imgui_widgets.cpp
         libs/imgui/imstb_rectpack.h
         libs/imgui/imstb_textedit.h
-        libs/imgui/imstb_truetype.h)
+        libs/imgui/imstb_truetype.h src/editor.cpp src/editor.h)
 

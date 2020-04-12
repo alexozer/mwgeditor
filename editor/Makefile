@@ -14,14 +14,14 @@
 #CXX = g++
 #CXX = clang++
 
-EXE = editor
-SOURCES = main.cpp
+EXE = mwgeditor
+SOURCES = src/main.cpp src/editor.cpp
 SOURCES += libs/imgui/examples/imgui_impl_sdl.cpp libs/imgui/examples/imgui_impl_opengl3.cpp
 SOURCES += libs/imgui/imgui.cpp libs/imgui/imgui_demo.cpp libs/imgui/imgui_draw.cpp libs/imgui/imgui_widgets.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 
-CXXFLAGS = -Ilibs/imgui/examples/ -Ilibs/imgui/
+CXXFLAGS = -Ilibs/imgui/examples/ -Ilibs/imgui/ -Isrc/
 CXXFLAGS += -g -Wall -Wformat
 LIBS =
 
@@ -88,7 +88,7 @@ endif
 %.o:libs/imgui/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-%.o:%.cpp
+%.o:src/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o:libs/imgui/examples/libs/gl3w/GL/%.c
