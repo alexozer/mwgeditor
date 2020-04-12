@@ -2,15 +2,36 @@
 #include "textures.h"
 
 #include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_opengl3.h"
 
-static Texture texture;
-
-void initEditor()
+struct VisualizationModel
 {
-    bool ret = loadTextureFromFile("../assets/textures/planet1.png", texture);
-    IM_ASSERT(ret);
+    float zoom;
+    ImVec2 pos;
+};
+
+static Texture texture = {};
+static VisualizationModel viz = {};
+
+static ImVec2 vizToWorldSpace(ImVec2 pos)
+{
+    return ImVec2(pos.x + viz.pos.x, pos.y + viz.pos.y);
+}
+
+static ImVec2 worldToVizSpace(ImVec2 pos)
+{
+    return ImVec2(pos.x - viz.pos.x, pos.y - viz.pos.y);
+}
+
+static void showHelp()
+{
+    ImGui::Begin("Help");
+
+    ImGui::Text("LEVEL VISUALIZATION:");
+    ImGui::BulletText("Click and drag a planet, food, or other object to change its position in the level");
+    ImGui::BulletText("Click and drag in empty space to pan the level");
+    ImGui::Separator();
+
+    ImGui::End();
 }
 
 static void showLevelVisualization()
@@ -19,30 +40,75 @@ static void showLevelVisualization()
 
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-    ImGui::Text("Click and drag a level object to change its position in the level,\n"
-                "Click and drag empty space to pan the level");
+    ImVec2 canvasStart = ImGui::GetCursorScreenPos();
+    ImVec2 canvasSize = ImGui::GetContentRegionAvail();
+    ImVec2 canvasEnd(canvasStart.x + canvasSize.x, canvasStart.y + canvasSize.y);
 
-    ImVec2 canvasPos = ImGui::GetCursorScreenPos();            // ImDrawList API uses screen coordinates!
-    ImVec2 canvasSize = ImGui::GetContentRegionAvail();        // Resize canvas to what's available
-    if (canvasSize.x < 50.0f) canvasSize.x = 50.0f;
-    if (canvasSize.y < 50.0f) canvasSize.y = 50.0f;
-    drawList->AddRectFilled(
-            canvasPos,
-            ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y),
-            IM_COL32(40, 40, 40, 255));
-    drawList->AddRect(
-            canvasPos,
-            ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y),
-            IM_COL32(255, 255, 255, 255));
+    ImGui::InvisibleButton("canvas", canvasSize);
+    ImVec2 mousePosInCanvas = ImVec2(ImGui::GetIO().MousePos.x - canvasStart.x, ImGui::GetIO().MousePos.y - canvasEnd.y);
 
-    ImVec2 uv0(0, 0);
-    ImVec2 uv1(0.5, 1);
-    drawList->AddImage(texture.id, canvasPos, ImVec2(canvasPos.x + texture.width, canvasPos.y + texture.height));
+    static bool isDraggingSpace = false;
+    static ImVec2 mouseDownVizPos;
+    static ImVec2 mouseDownPos;
+
+    if (ImGui::IsItemHovered() && !isDraggingSpace && ImGui::IsMouseClicked(0)) {
+        isDraggingSpace = true;
+        mouseDownVizPos = viz.pos;
+        mouseDownPos = mousePosInCanvas;
+    }
+
+    if (isDraggingSpace)
+    {
+        viz.pos = ImVec2(mouseDownVizPos.x - (mousePosInCanvas.x - mouseDownPos.x),
+                         mouseDownVizPos.y - (mousePosInCanvas.y - mouseDownPos.y));
+        if (!ImGui::IsMouseDown(0)) isDraggingSpace = false;
+    }
+
+    ImVec2 worldStart = vizToWorldSpace(ImVec2());
+    ImVec2 worldEnd = vizToWorldSpace(canvasSize);
+
+    worldStart.x = static_cast<int>(worldStart.x / 100) * 100;
+    worldStart.y = static_cast<int>(worldStart.y / 100) * 100;
+
+    for (float x = worldStart.x; x < worldEnd.x; x += 100)
+    {
+        ImVec2 p1 = worldToVizSpace(ImVec2(x, 0));
+        p1.x += canvasStart.x;
+        p1.y = canvasStart.y;
+
+        ImVec2 p2 = worldToVizSpace(ImVec2(x, 0));
+        p2.x += canvasStart.x;
+        p2.y = canvasEnd.y;
+
+        ImU32 color = IM_COL32(50, 50, 50, 255);
+        drawList->AddLine(p1, p2, color);
+    }
+
+    for (float y = worldStart.y; y < worldEnd.y; y += 100)
+    {
+        ImVec2 p1 = worldToVizSpace(ImVec2(0, y));
+        p1.x = canvasStart.x;
+        p1.y += canvasStart.y;
+
+        ImVec2 p2 = worldToVizSpace(ImVec2(0, y));
+        p2.x = canvasEnd.x;
+        p2.y += canvasStart.y;
+
+        ImU32 color = IM_COL32(50, 50, 50, 255);
+        drawList->AddLine(p1, p2, color);
+    }
+
+//    ImVec2 uv0(0, 0);
+//    ImVec2 uv1(0.5, 1);
+//    drawList->AddImage(texture.id,
+//            ImVec2(canvasPos.x - 200, canvasPos.y - 200),
+//            ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y));
 
     ImGui::End();
 }
 
-void runEditor() {
+static void showDemoStuff()
+{
     // Our state
     static bool show_demo_window = true;
     static bool show_another_window = false;
@@ -86,6 +152,19 @@ void runEditor() {
             show_another_window = false;
         ImGui::End();
     }
+}
 
+void initEditor()
+{
+    bool ret = loadTextureFromFile("../assets/textures/planet1.png", texture);
+    IM_ASSERT(ret);
+
+    viz.zoom = 1;
+}
+
+void runEditor()
+{
+    showDemoStuff();
+    showHelp();
     showLevelVisualization();
 }
