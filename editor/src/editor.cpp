@@ -91,8 +91,8 @@ static void showHelp()
 
 static void showLevelObject(ImDrawList *drawList, const std::shared_ptr<ObjectModel>& object)
 {
-    float scaledWidth = object->tex.width * object->scale / object->cols;
-    float scaledHeight = object->tex.height * object->scale;
+    float scaledWidth = object->frameSize().x * object->scale;
+    float scaledHeight = object->frameSize().y * object->scale;
 
     ImVec2 worldTexStart(object->pos.x - scaledWidth / 2,
                          object->pos.y - scaledHeight / 2);
@@ -103,7 +103,7 @@ static void showLevelObject(ImDrawList *drawList, const std::shared_ptr<ObjectMo
     ImVec2 screenEnd = viz.worldToScreenSpace(worldTexEnd);
 
     ImVec2 uv0(0, 0);
-    ImVec2 uv1(1.f / object->cols, 1);
+    ImVec2 uv1(object->uvEnd());
 
     drawList->AddImage(object->tex.id, screenStart, screenEnd, uv0, uv1);
 }

@@ -17,6 +17,21 @@ struct ObjectModel
 
     int cols; // Columns of animation frames
     int span; // Total animation frames
+
+    inline ImVec2 frameSize()
+    {
+        int rows = span / cols;
+        if (span % cols != 0) rows++;
+        return ImVec2(static_cast<float>(tex.width) / cols,
+                      static_cast<float>(tex.height) / rows);
+    }
+
+    inline ImVec2 uvEnd()
+    {
+        int rows = span / cols;
+        if (span % cols != 0) rows++;
+        return ImVec2(1.f / cols, 1.f / rows);
+    }
 };
 
 struct PlanetModel : public ObjectModel
