@@ -67,17 +67,17 @@ std::shared_ptr<FoodModel> loadJsonFood(const json& foodJson, const TexTable& te
     return foodModel;
 }
 
-LevelModel loadJsonLevel(std::string filename)
+std::shared_ptr<LevelModel> loadJsonLevel(std::string filename)
 {
     std::ifstream f(filename);
     json levelJson;
     f >> levelJson;
 
-    LevelModel levelModel = {};
+    auto levelModel = std::make_shared<LevelModel>();
 
     // Get level number
     std::string levelNumStr = levelJson["scenes"].items().begin().key();
-    levelModel.levelNumber = std::stoi(levelNumStr.substr(2, levelNumStr.size()));
+    levelModel->levelNumber = std::stoi(levelNumStr.substr(2, levelNumStr.size()));
 
     // Build a little list of textures
     TexTable texTable;
@@ -109,25 +109,25 @@ LevelModel loadJsonLevel(std::string filename)
         {
             planet->order = PlanetOrder::MIDDLE;
         }
-        levelModel.planets.emplace_back(planet);
+        levelModel->planets.emplace_back(planet);
     }
 
     // Load foods
     auto& foodMapJson = levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["food"]["children"];
     for (auto& foodJsonItem : foodMapJson.items())
     {
-        levelModel.foods.emplace_back(loadJsonFood(foodJsonItem.value(), texTable));
+        levelModel->foods.emplace_back(loadJsonFood(foodJsonItem.value(), texTable));
     }
 
     // Load player
     auto& playerJson = levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["player"];
-    levelModel.player = std::make_shared<ObjectModel>();
-    loadObjectModel(playerJson, texTable, levelModel.player);
+    levelModel->player = std::make_shared<ObjectModel>();
+    loadObjectModel(playerJson, texTable, levelModel->player);
 
     // Load customer
     auto& customerJson = levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["customer"];
-    levelModel.customer = std::make_shared<ObjectModel>();
-    loadObjectModel(customerJson, texTable, levelModel.customer);
+    levelModel->customer = std::make_shared<ObjectModel>();
+    loadObjectModel(customerJson, texTable, levelModel->customer);
 
     return levelModel;
 }

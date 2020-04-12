@@ -74,8 +74,9 @@ private:
 
 };
 
-static LevelModel level = {};
+static std::shared_ptr<LevelModel> level = {};
 static VisualizationModel viz = {};
+static std::shared_ptr<ObjectModel> selectedObj = nullptr;
 
 static void showHelp()
 {
@@ -166,6 +167,33 @@ static void handleDragging()
     }
 }
 
+void showLevelObjectSeletion(ImDrawList *drawList)
+{
+    // Draw rect around selected object
+    if (selectedObj)
+    {
+        auto rectColor = IM_COL32(0, 50, 180, 255);
+
+        // TODO deduplicate this with showLevelObject()?
+        float scaledWidth = selectedObj->frameSize().x * selectedObj->scale;
+        float scaledHeight = selectedObj->frameSize().y * selectedObj->scale;
+
+        ImVec2 worldTexStart(selectedObj->pos.x - scaledWidth / 2,
+                             selectedObj->pos.y - scaledHeight / 2);
+        ImVec2 worldTexEnd(selectedObj->pos.x + scaledWidth / 2,
+                           selectedObj->pos.y + scaledHeight / 2);
+
+        ImVec2 screenStart = viz.worldToScreenSpace(worldTexStart);
+        ImVec2 screenEnd = viz.worldToScreenSpace(worldTexEnd);
+
+        ImVec2 uv0(0, 0);
+        ImVec2 uv1(selectedObj->uvEnd());
+
+        drawList->AddRect(screenStart, screenEnd, rectColor, 2, ~0, 6);
+    }
+
+}
+
 static void showLevelVisualization()
 {
     ImGui::Begin("Level Visualization");
@@ -177,16 +205,18 @@ static void showLevelVisualization()
     handleDragging();
     showLevelGrid(drawList);
 
-    for (auto& planet : level.planets)
+    for (auto& planet : level->planets)
     {
         showLevelObject(drawList, planet);
     }
-    for (auto& food : level.foods)
+    for (auto& food : level->foods)
     {
         showLevelObject(drawList, food);
     }
-    showLevelObject(drawList, level.player);
-    showLevelObject(drawList, level.customer);
+    showLevelObject(drawList, level->player);
+    showLevelObject(drawList, level->customer);
+
+    showLevelObjectSeletion(drawList);
 
     ImGui::End();
 }
@@ -244,11 +274,12 @@ void initEditor()
 
     // Initially center on the start planet
     // Or else the initial position is (0, 0) I guess
-    for (auto& planet : level.planets)
+    for (auto& planet : level->planets)
     {
         if (planet->order == PlanetOrder::START)
         {
             viz.setWorldPos(planet->pos);
+            selectedObj = planet;
         }
     }
 }
