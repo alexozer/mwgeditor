@@ -82,13 +82,13 @@ endif
 ## BUILD RULES
 ##---------------------------------------------------------------------
 
-%.o:libs/imgui/examples/example_sdl_opengl3/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
 %.o:libs/imgui/examples/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o:libs/imgui/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o:%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o:libs/imgui/examples/libs/gl3w/GL/%.c

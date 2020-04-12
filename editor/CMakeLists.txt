@@ -3,14 +3,12 @@ project(editor)
 
 set(CMAKE_CXX_STANDARD 14)
 
-find_package(SDL2 REQUIRED)
-
 include_directories(libs/imgui)
 include_directories(libs/imgui/examples)
 include_directories(libs/imgui/misc/cpp)
 include_directories(libs/imgui/misc/freetype)
 include_directories(libs/imgui/misc/single_file)
-include_directories(${SDL2_INCLUDE_DIRS})
+include_directories(/usr/include/SDL2) # Probably only works on Linux, TODO fix
 
 add_executable(editor
         main.cpp
@@ -29,4 +27,3 @@ add_executable(editor
         libs/imgui/imstb_textedit.h
         libs/imgui/imstb_truetype.h)
 
-target_link_libraries(editor ${SDL2_LIBRARIES})
