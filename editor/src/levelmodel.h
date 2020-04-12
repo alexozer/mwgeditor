@@ -4,6 +4,7 @@
 #include "textures.h"
 
 #include <vector>
+#include <memory>
 
 enum class PlanetOrder { START, MIDDLE, END };
 
@@ -13,6 +14,9 @@ struct ObjectModel
     float scale;
     ImVec2 pos;
     ImVec2 anchor;
+
+    int cols; // Columns of animation frames
+    int span; // Total animation frames
 };
 
 struct PlanetModel : public ObjectModel
@@ -25,17 +29,16 @@ struct PlanetModel : public ObjectModel
 struct FoodModel : public ObjectModel
 {
     bool cookable;
-    int cols;
 };
 
 struct LevelModel {
     int levelNumber;
 
-    std::vector<PlanetModel> planets;
+    std::vector<std::shared_ptr<PlanetModel>> planets;
 
-    std::vector<FoodModel> foods;
+    std::vector<std::shared_ptr<FoodModel>> foods;
 
-    ObjectModel player;
-    ObjectModel customer;
+    std::shared_ptr<ObjectModel> player;
+    std::shared_ptr<ObjectModel> customer;
 };
 

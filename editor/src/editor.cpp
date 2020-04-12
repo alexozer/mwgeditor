@@ -89,49 +89,23 @@ static void showHelp()
     ImGui::End();
 }
 
-static void showLevelPlanets(ImDrawList *drawList)
+static void showLevelObject(ImDrawList *drawList, const std::shared_ptr<ObjectModel>& object)
 {
-    for (auto& planet : level.planets)
-    {
-        float scaledWidth = planet.tex.width * planet.scale / 2;
-        float scaledHeight = planet.tex.height * planet.scale;
+    float scaledWidth = object->tex.width * object->scale / object->cols;
+    float scaledHeight = object->tex.height * object->scale;
 
-        ImVec2 worldTexStart(planet.pos.x - scaledWidth / 2,
-                             planet.pos.y - scaledHeight / 2);
-        ImVec2 worldTexEnd(planet.pos.x + scaledWidth / 2,
-                           planet.pos.y + scaledHeight / 2);
+    ImVec2 worldTexStart(object->pos.x - scaledWidth / 2,
+                         object->pos.y - scaledHeight / 2);
+    ImVec2 worldTexEnd(object->pos.x + scaledWidth / 2,
+                       object->pos.y + scaledHeight / 2);
 
-        ImVec2 screenStart = viz.worldToScreenSpace(worldTexStart);
-        ImVec2 screenEnd = viz.worldToScreenSpace(worldTexEnd);
+    ImVec2 screenStart = viz.worldToScreenSpace(worldTexStart);
+    ImVec2 screenEnd = viz.worldToScreenSpace(worldTexEnd);
 
-        ImVec2 uv0(0, 0);
-        ImVec2 uv1(0.5, 1);
+    ImVec2 uv0(0, 0);
+    ImVec2 uv1(1.f / object->cols, 1);
 
-        drawList->AddImage(planet.tex.id, screenStart, screenEnd, uv0, uv1);
-    }
-}
-
-// TODO deduplicate with drawing planets, customers, etc?
-static void showLevelFoods(ImDrawList *drawList)
-{
-    for (auto& food : level.foods)
-    {
-        float scaledWidth = food.tex.width * food.scale / food.cols;
-        float scaledHeight = food.tex.height * food.scale;
-
-        ImVec2 worldTexStart(food.pos.x - scaledWidth / 2,
-                             food.pos.y - scaledHeight / 2);
-        ImVec2 worldTexEnd(food.pos.x + scaledWidth / 2,
-                           food.pos.y + scaledHeight / 2);
-
-        ImVec2 screenStart = viz.worldToScreenSpace(worldTexStart);
-        ImVec2 screenEnd = viz.worldToScreenSpace(worldTexEnd);
-
-        ImVec2 uv0(0, 0);
-        ImVec2 uv1(1.f / food.cols, 1);
-
-        drawList->AddImage(food.tex.id, screenStart, screenEnd, uv0, uv1);
-    }
+    drawList->AddImage(object->tex.id, screenStart, screenEnd, uv0, uv1);
 }
 
 static void showLevelGrid(ImDrawList *drawList) {
@@ -202,8 +176,17 @@ static void showLevelVisualization()
 
     handleDragging();
     showLevelGrid(drawList);
-    showLevelPlanets(drawList);
-    showLevelFoods(drawList);
+
+    for (auto& planet : level.planets)
+    {
+        showLevelObject(drawList, planet);
+    }
+    for (auto& food : level.foods)
+    {
+        showLevelObject(drawList, food);
+    }
+    showLevelObject(drawList, level.player);
+    showLevelObject(drawList, level.customer);
 
     ImGui::End();
 }
@@ -263,9 +246,9 @@ void initEditor()
     // Or else the initial position is (0, 0) I guess
     for (auto& planet : level.planets)
     {
-        if (planet.order == PlanetOrder::START)
+        if (planet->order == PlanetOrder::START)
         {
-            viz.setWorldPos(planet.pos);
+            viz.setWorldPos(planet->pos);
         }
     }
 }

@@ -21,49 +21,50 @@ ImVec2 loadJsonCoord(const json& coordJson)
     return ImVec2(scale, scale);
 }
 
-PlanetModel loadJsonPlanet(const json& planetJson, const TexTable& texTable)
+void loadObjectModel(const json& objectJson, const TexTable& texTable, std::shared_ptr<ObjectModel> objectModel)
 {
-    PlanetModel planetModel;
+    std::string texName = objectJson["data"]["texture"].get<std::string>();
+    objectModel->tex = texTable.at(texName);
+    objectModel->pos = loadJsonCoord(objectJson["data"]["position"]);
+    objectModel->anchor = loadJsonCoord(objectJson["data"]["anchor"]);
+    objectModel->scale = loadJsonCoord(objectJson["data"]["scale"]).x;
 
-    std::string texName = planetJson["data"]["texture"].get<std::string>();
-    planetModel.tex = texTable.at(texName);
-    planetModel.pos = loadJsonCoord(planetJson["data"]["position"]);
-    planetModel.anchor = loadJsonCoord(planetJson["data"]["anchor"]);
-    planetModel.scale = loadJsonCoord(planetJson["data"]["scale"]).x;
+    objectModel->cols = 1;
+    auto colsIter = objectJson["data"].find("cols");
+    if (colsIter != objectJson["data"].end())
+    {
+        objectModel->cols = colsIter->get<int>();
+    }
 
-    planetModel.hasFood = planetJson["data"]["hasFood"].get<bool>();
-    planetModel.isSun = planetJson["data"]["isSun"].get<bool>();
+    objectModel->span = objectModel->cols;
+    auto spanIter = objectJson["data"].find("span");
+    if (spanIter != objectJson["data"].end())
+    {
+        objectModel->span = spanIter->get<int>();
+    }
+}
+
+std::shared_ptr<PlanetModel> loadJsonPlanet(const json& planetJson, const TexTable& texTable)
+{
+    auto planetModel = std::make_shared<PlanetModel>();
+
+    loadObjectModel(planetJson, texTable, planetModel);
+
+    planetModel->hasFood = planetJson["data"]["hasFood"].get<bool>();
+    planetModel->isSun = planetJson["data"]["isSun"].get<bool>();
 
     return planetModel;
 }
 
-FoodModel loadJsonFood(const json& foodJson, const TexTable& texTable)
+std::shared_ptr<FoodModel> loadJsonFood(const json& foodJson, const TexTable& texTable)
 {
-    FoodModel foodModel;
+    auto foodModel = std::make_shared<FoodModel>();
 
-    std::string texName = foodJson["data"]["texture"].get<std::string>();
-    foodModel.tex = texTable.at(texName);
-    foodModel.pos = loadJsonCoord(foodJson["data"]["position"]);
-    foodModel.anchor = loadJsonCoord(foodJson["data"]["anchor"]);
-    foodModel.scale = loadJsonCoord(foodJson["data"]["scale"]).x;
+    loadObjectModel(foodJson, texTable, foodModel);
 
-    foodModel.cols = foodJson["data"]["cols"].get<int>();
-    foodModel.cookable = foodJson["data"]["cookable"].get<bool>();
+    foodModel->cookable = foodJson["data"]["cookable"].get<bool>();
 
     return foodModel;
-}
-
-ObjectModel loadObjectModel(const json& objectJson, const TexTable& texTable)
-{
-    ObjectModel objectModel = {};
-
-    std::string texName = objectJson["data"]["texture"].get<std::string>();
-    objectModel.tex = texTable.at(texName);
-    objectModel.pos = loadJsonCoord(objectJson["data"]["position"]);
-    objectModel.anchor = loadJsonCoord(objectJson["data"]["anchor"]);
-    objectModel.scale = loadJsonCoord(objectJson["data"]["scale"]).x;
-
-    return objectModel;
 }
 
 LevelModel loadJsonLevel(std::string filename)
@@ -95,18 +96,18 @@ LevelModel loadJsonLevel(std::string filename)
     auto& planetMapJson = levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["planets"]["children"];
     for (auto& planetJsonItem : planetMapJson.items())
     {
-        PlanetModel planet = loadJsonPlanet(planetJsonItem.value(), texTable);
+        auto planet = loadJsonPlanet(planetJsonItem.value(), texTable);
         if (planetJsonItem.key() == "startPlanet")
         {
-            planet.order = PlanetOrder::START;
+            planet->order = PlanetOrder::START;
         }
         else if (planetJsonItem.key() == "endPlanet")
         {
-            planet.order = PlanetOrder::END;
+            planet->order = PlanetOrder::END;
         }
         else
         {
-            planet.order = PlanetOrder::MIDDLE;
+            planet->order = PlanetOrder::MIDDLE;
         }
         levelModel.planets.emplace_back(planet);
     }
@@ -120,11 +121,13 @@ LevelModel loadJsonLevel(std::string filename)
 
     // Load player
     auto& playerJson = levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["player"];
-    levelModel.player = loadObjectModel(playerJson, texTable);
+    levelModel.player = std::make_shared<ObjectModel>();
+    loadObjectModel(playerJson, texTable, levelModel.player);
 
     // Load customer
     auto& customerJson = levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["customer"];
-    levelModel.customer = loadObjectModel(customerJson, texTable);
+    levelModel.customer = std::make_shared<ObjectModel>();
+    loadObjectModel(customerJson, texTable, levelModel.customer);
 
     return levelModel;
 }
