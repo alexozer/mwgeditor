@@ -26,5 +26,5 @@ add_executable(editor
         libs/imgui/imgui_widgets.cpp
         libs/imgui/imstb_rectpack.h
         libs/imgui/imstb_textedit.h
-        libs/imgui/imstb_truetype.h src/editor.cpp src/editor.h libs/stb/stb_image.h src/textures.cpp src/textures.h)
+        libs/imgui/imstb_truetype.h src/editor.cpp src/editor.h libs/stb/stb_image.h src/textures.cpp src/textures.h src/levelmodel.h)
 
