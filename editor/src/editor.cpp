@@ -112,61 +112,37 @@ static void showLevelPlanets(ImDrawList *drawList)
 }
 
 static void showLevelGrid(ImDrawList *drawList) {
-//    Canvas canvas = generateWindowCanvas();
-//
-//    ImGui::InvisibleButton("canvas", canvas.size);
-//    ImVec2 mousePosInCanvas = ImVec2(ImGui::GetIO().MousePos.x - canvas.start.x, ImGui::GetIO().MousePos.y - canvas.end.y);
-//
-//    static bool isDraggingSpace = false;
-//    static ImVec2 mouseDownVizPos;
-//    static ImVec2 mouseDownPos;
-//
-//    if (ImGui::IsItemHovered() && !isDraggingSpace && ImGui::IsMouseClicked(0)) {
-//        isDraggingSpace = true;
-//        mouseDownVizPos = viz.pos;
-//        mouseDownPos = mousePosInCanvas;
-//    }
-//
-//    if (isDraggingSpace)
-//    {
-//        viz.pos = ImVec2(mouseDownVizPos.x - (mousePosInCanvas.x - mouseDownPos.x),
-//                         mouseDownVizPos.y - (mousePosInCanvas.y - mouseDownPos.y));
-//        if (!ImGui::IsMouseDown(0)) isDraggingSpace = false;
-//    }
-//
-//    ImVec2 worldStart = vizToWorldSpace(ImVec2());
-//    ImVec2 worldEnd = vizToWorldSpace(canvasSize);
-//
-//    worldStart.x = static_cast<int>(worldStart.x / 100) * 100;
-//    worldStart.y = static_cast<int>(worldStart.y / 100) * 100;
-//
-//    for (float x = worldStart.x; x < worldEnd.x; x += 100)
-//    {
-//        ImVec2 p1 = worldToVizSpace(ImVec2(x, 0));
-//        p1.x += canvasStart.x;
-//        p1.y = canvasStart.y;
-//
-//        ImVec2 p2 = worldToVizSpace(ImVec2(x, 0));
-//        p2.x += canvasStart.x;
-//        p2.y = canvasEnd.y;
-//
-//        ImU32 color = IM_COL32(50, 50, 50, 255);
-//        drawList->AddLine(p1, p2, color);
-//    }
-//
-//    for (float y = worldStart.y; y < worldEnd.y; y += 100)
-//    {
-//        ImVec2 p1 = worldToVizSpace(ImVec2(0, y));
-//        p1.x = canvasStart.x;
-//        p1.y += canvasStart.y;
-//
-//        ImVec2 p2 = worldToVizSpace(ImVec2(0, y));
-//        p2.x = canvasEnd.x;
-//        p2.y += canvasStart.y;
-//
-//        ImU32 color = IM_COL32(50, 50, 50, 255);
-//        drawList->AddLine(p1, p2, color);
-//    }
+    ImVec2 worldStart = viz.screenToWorldSpace(viz.getCanvas().start);
+    ImVec2 worldEnd = viz.screenToWorldSpace(viz.getCanvas().end);
+
+    constexpr float gridSpacing = 100.f;
+
+    worldStart.x = static_cast<int>(worldStart.x / gridSpacing) * gridSpacing;
+    worldStart.y = static_cast<int>(worldStart.y / gridSpacing) * gridSpacing;
+
+    ImU32 color = IM_COL32(50, 50, 50, 255);
+
+    for (float x = worldStart.x; x < worldEnd.x; x += gridSpacing)
+    {
+        ImVec2 p1 = viz.worldToScreenSpace(ImVec2(x, 0));
+        p1.y = viz.getCanvas().start.y;
+
+        ImVec2 p2 = viz.worldToScreenSpace(ImVec2(x, 0));
+        p2.y = viz.getCanvas().end.y;
+
+        drawList->AddLine(p1, p2, color);
+    }
+
+    for (float y = worldStart.y; y < worldEnd.y; y += gridSpacing)
+    {
+        ImVec2 p1 = viz.worldToScreenSpace(ImVec2(0, y));
+        p1.x = viz.getCanvas().start.x;
+
+        ImVec2 p2 = viz.worldToScreenSpace(ImVec2(0, y));
+        p2.x = viz.getCanvas().end.x;
+
+        drawList->AddLine(p1, p2, color);
+    }
 }
 
 static void handleDragging()
