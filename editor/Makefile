@@ -22,7 +22,7 @@ OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 
 CXXFLAGS = -Ilibs/imgui/examples/ -Ilibs/imgui/ -Ilibs/stb -Ilibs/json -Isrc/
-CXXFLAGS += -g -Wall -Wformat
+CXXFLAGS += -g -Wall -Wformat -MD
 LIBS =
 
 ##---------------------------------------------------------------------
@@ -105,3 +105,5 @@ $(EXE): $(OBJS)
 
 clean:
 	rm -f $(EXE) $(OBJS)
+
+-include $(OBJS:.o=.d)
