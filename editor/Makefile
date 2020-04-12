@@ -15,13 +15,13 @@
 #CXX = clang++
 
 EXE = mwgeditor
-SOURCES = src/main.cpp src/editor.cpp
+SOURCES = src/main.cpp src/editor.cpp src/textures.cpp
 SOURCES += libs/imgui/examples/imgui_impl_sdl.cpp libs/imgui/examples/imgui_impl_opengl3.cpp
 SOURCES += libs/imgui/imgui.cpp libs/imgui/imgui_demo.cpp libs/imgui/imgui_draw.cpp libs/imgui/imgui_widgets.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 
-CXXFLAGS = -Ilibs/imgui/examples/ -Ilibs/imgui/ -Isrc/
+CXXFLAGS = -Ilibs/imgui/examples/ -Ilibs/imgui/ -Ilibs/stb -Isrc/
 CXXFLAGS += -g -Wall -Wformat
 LIBS =
 

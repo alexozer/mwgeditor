@@ -1,6 +1,46 @@
 #include "editor.h"
+#include "textures.h"
 
 #include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+
+static Texture texture;
+
+void initEditor()
+{
+    bool ret = loadTextureFromFile("../assets/textures/planet1.png", texture);
+    IM_ASSERT(ret);
+}
+
+static void showLevelVisualization()
+{
+    ImGui::Begin("Level Visualization");
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+    ImGui::Text("Click and drag a level object to change its position in the level,\n"
+                "Click and drag empty space to pan the level");
+
+    ImVec2 canvasPos = ImGui::GetCursorScreenPos();            // ImDrawList API uses screen coordinates!
+    ImVec2 canvasSize = ImGui::GetContentRegionAvail();        // Resize canvas to what's available
+    if (canvasSize.x < 50.0f) canvasSize.x = 50.0f;
+    if (canvasSize.y < 50.0f) canvasSize.y = 50.0f;
+    drawList->AddRectFilled(
+            canvasPos,
+            ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y),
+            IM_COL32(40, 40, 40, 255));
+    drawList->AddRect(
+            canvasPos,
+            ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y),
+            IM_COL32(255, 255, 255, 255));
+
+    ImVec2 uv0(0, 0);
+    ImVec2 uv1(0.5, 1);
+    drawList->AddImage(texture.id, canvasPos, ImVec2(canvasPos.x + texture.width, canvasPos.y + texture.height));
+
+    ImGui::End();
+}
 
 void runEditor() {
     // Our state
@@ -46,4 +86,6 @@ void runEditor() {
             show_another_window = false;
         ImGui::End();
     }
+
+    showLevelVisualization();
 }
