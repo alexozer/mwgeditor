@@ -1,0 +1,5 @@
+/example_sdl_opengl3
+*.o
+/cmake-build-debug/
+/imgui.ini
+/.idea/
