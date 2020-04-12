@@ -102,17 +102,23 @@ static void showLevelVisualization()
     // Draw planets
     for (auto& planet : level.planets)
     {
-        ImVec2 vizPos = worldToVizSpace(planet.pos);
+        ImVec2 vizCenter = worldToVizSpace(planet.pos);
+
+        float scaledWidth = planet.tex.width * planet.scale;
+        float scaledHeight = planet.tex.height * planet.scale;
+
+        // Assume anchor is (0.5, 0.5)
+        ImVec2 vizStart, vizEnd;
+        vizStart.x = vizCenter.x - scaledWidth / 4;
+        vizStart.y = vizCenter.y - scaledHeight / 2;
+        vizEnd.x = vizCenter.x + scaledWidth / 4;
+        vizEnd.y = vizCenter.y + scaledHeight / 2;
 
         ImVec2 uv0(0, 0);
-        ImVec2 uv1(1, 1);
-    }
+        ImVec2 uv1(0.5, 1);
 
-//    ImVec2 uv0(0, 0);
-//    ImVec2 uv1(0.5, 1);
-//    drawList->AddImage(texture.id,
-//            ImVec2(canvasPos.x - 200, canvasPos.y - 200),
-//            ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y));
+        drawList->AddImage(planet.tex.id, vizStart, vizEnd, uv0, uv1);
+    }
 
     ImGui::End();
 }
