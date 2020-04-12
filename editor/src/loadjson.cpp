@@ -84,9 +84,10 @@ LevelModel loadJsonLevel(std::string filename)
     {
         std::string shortName = texJson.key();
         std::string fileName = texJson.value()["file"].get<std::string>();
+        fileName = "../assets/" + fileName;
 
         Texture tex{};
-        loadTextureFromFile(fileName.c_str(), tex);
+        IM_ASSERT(loadTextureFromFile(fileName.c_str(), tex));
         texTable.emplace(shortName, tex);
     }
 

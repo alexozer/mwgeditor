@@ -10,7 +10,7 @@ struct VisualizationModel
     ImVec2 pos;
 };
 
-static Texture texture = {};
+static LevelModel level = {};
 static VisualizationModel viz = {};
 
 static ImVec2 vizToWorldSpace(ImVec2 pos)
@@ -157,13 +157,9 @@ static void showDemoStuff()
 
 void initEditor()
 {
-    bool ret = loadTextureFromFile("../assets/textures/planet1.png", texture);
-    IM_ASSERT(ret);
-
     viz.pos = ImVec2();
     viz.zoom = 1;
-
-    loadJsonLevel("examples/level1.json");
+    level = loadJsonLevel("examples/level1.json");
 }
 
 void runEditor()
