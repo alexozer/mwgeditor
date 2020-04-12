@@ -1,4 +1,4 @@
-/example_sdl_opengl3
+/editor
 *.o
 /cmake-build-debug/
 /imgui.ini
