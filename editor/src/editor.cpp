@@ -143,17 +143,70 @@ static void showLevelGrid(ImDrawList *drawList) {
     }
 }
 
-static void handleDragging()
+static std::shared_ptr<ObjectModel> findObjectAtScreenPos(ImVec2 pos)
 {
-    ImGui::InvisibleButton("canvas", viz.getCanvas().size);
+    ImVec2 worldPos = viz.screenToWorldSpace(pos);
 
+    std::vector<std::shared_ptr<ObjectModel>> allObjects;
+    allObjects.insert(allObjects.end(), level->planets.begin(), level->planets.end());
+    allObjects.insert(allObjects.end(), level->foods.begin(), level->foods.end());
+    allObjects.emplace_back(level->customer);
+    allObjects.emplace_back(level->player);
+
+    for (auto obj : allObjects) {
+        float scaledWidth = obj->frameSize().x * obj->scale;
+        float scaledHeight = obj->frameSize().y * obj->scale;
+
+        if (worldPos.x >= (obj->pos.x - scaledWidth / 2) &&
+            worldPos.y >= (obj->pos.y - scaledHeight / 2) &&
+            worldPos.x <= (obj->pos.x + scaledWidth / 2) &&
+            worldPos.y <= (obj->pos.y + scaledHeight / 2))
+        {
+            return obj;
+        }
+    }
+
+    return nullptr;
+}
+
+static void handleDraggingObject()
+{
+    // TODO dedup with handleDraggingSpace()?
+
+    static bool isDraggingObj = false;
+    static ImVec2 mouseDownPos;
+    static ImVec2 oldWorldPos;
+
+    ImVec2 currMousePos = ImGui::GetIO().MousePos;
+
+    if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0) && !isDraggingObj)
+    {
+        auto hoverObj = findObjectAtScreenPos(currMousePos);
+        if (hoverObj)
+        {
+            isDraggingObj = true;
+            selectedObj = hoverObj;
+            mouseDownPos = currMousePos;
+            oldWorldPos = hoverObj->pos;
+        }
+    }
+    if (isDraggingObj)
+    {
+        selectedObj->pos = ImVec2(oldWorldPos.x + currMousePos.x - mouseDownPos.x,
+                                  oldWorldPos.y + currMousePos.y - mouseDownPos.y);
+        if (!ImGui::IsMouseDown(0)) isDraggingObj = false;
+    }
+}
+
+static void handleDraggingSpace()
+{
     static bool isDraggingSpace = false;
     static ImVec2 mouseDownScreenPos;
     static ImVec2 oldVizWorldPos;
 
     ImVec2 currMouseScreenPos = ImGui::GetIO().MousePos;
 
-    if (ImGui::IsItemHovered() && !isDraggingSpace && ImGui::IsMouseClicked(0))
+    if (ImGui::IsItemHovered() && !isDraggingSpace && ImGui::IsMouseClicked(0) && !findObjectAtScreenPos(currMouseScreenPos))
     {
         isDraggingSpace = true;
         mouseDownScreenPos = currMouseScreenPos;
@@ -167,7 +220,7 @@ static void handleDragging()
     }
 }
 
-void showLevelObjectSeletion(ImDrawList *drawList)
+void showLevelObjectSelection(ImDrawList *drawList)
 {
     // Draw rect around selected object
     if (selectedObj)
@@ -201,8 +254,10 @@ static void showLevelVisualization()
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     viz.generateWindowCanvas();
+    ImGui::InvisibleButton("canvas", viz.getCanvas().size); // Used to detect clicks inside window
 
-    handleDragging();
+    handleDraggingObject();
+    handleDraggingSpace();
     showLevelGrid(drawList);
 
     for (auto& planet : level->planets)
@@ -216,7 +271,7 @@ static void showLevelVisualization()
     showLevelObject(drawList, level->player);
     showLevelObject(drawList, level->customer);
 
-    showLevelObjectSeletion(drawList);
+    showLevelObjectSelection(drawList);
 
     ImGui::End();
 }
