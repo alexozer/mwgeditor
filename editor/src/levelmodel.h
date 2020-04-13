@@ -32,6 +32,8 @@ struct ObjectModel
         if (span % cols != 0) rows++;
         return ImVec2(1.f / cols, 1.f / rows);
     }
+
+    virtual ~ObjectModel() = default;
 };
 
 struct PlanetModel : public ObjectModel

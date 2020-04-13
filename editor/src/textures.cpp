@@ -56,6 +56,7 @@ bool loadTextureFromFile(const char* filename, Texture& outTexture)
     outTexture.id = reinterpret_cast<void *>(image_texture);
     outTexture.width = image_width;
     outTexture.height = image_height;
+    outTexture.filename = filename;
 
     return true;
 }

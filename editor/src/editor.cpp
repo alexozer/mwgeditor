@@ -83,6 +83,7 @@ static void showHelp()
     ImGui::Begin("Help");
 
     ImGui::Text("LEVEL VISUALIZATION:");
+    ImGui::BulletText("Click a planet, food, or other object to select it");
     ImGui::BulletText("Click and drag a planet, food, or other object to change its position in the level");
     ImGui::BulletText("Click and drag in empty space to pan the level");
     ImGui::Separator();
@@ -276,6 +277,80 @@ static void showLevelVisualization()
     ImGui::End();
 }
 
+static void showPropertiesEditor()
+{
+    ImVec4 fakeHeaderColor(0.4f, 0.4f, 1.0f, 1.0f);
+
+    ImGui::Begin("Properties Editor");
+
+    ImGui::TextColored(fakeHeaderColor, "Level Properties");
+
+    ImGui::InputInt("Level number", &level->levelNumber);
+
+    ImGui::Button("Add planet");
+    ImGui::SameLine();
+    ImGui::Button("Add food");
+
+    ImGui::Separator();
+
+    if (!selectedObj)
+    {
+        ImGui::Text("No selected object");
+        ImGui::End();
+        return;
+    }
+
+    ImGui::TextColored(fakeHeaderColor, "Object Properties");
+
+    ImGui::Text("Texture filepath: %s", selectedObj->tex.filename.c_str());
+
+    // Is casting like this bad?
+    ImGui::InputFloat2("Position", reinterpret_cast<float *>(&selectedObj->pos), "%.3f");
+    ImGui::InputFloat2("Anchor", reinterpret_cast<float *>(&selectedObj->anchor), "%.3f");
+    ImGui::SliderFloat("Scale", &selectedObj->scale, 0.1, 2.0);
+
+    ImGui::InputInt("Texture columns", &selectedObj->cols);
+    ImGui::InputInt("Texture span", &selectedObj->span);
+
+    // Dummies for now
+    bool isCustomer = selectedObj == level->customer;
+    bool isPlayer = selectedObj == level->player;
+    ImGui::Checkbox("Is player", &isPlayer);
+    ImGui::SameLine();
+    ImGui::Checkbox("Is customer", &isCustomer);
+
+    ImGui::Separator();
+
+    // Show planet-specific properties if this is a planet
+    auto selectedPlanet = std::dynamic_pointer_cast<PlanetModel>(selectedObj);
+    if (selectedPlanet)
+    {
+        ImGui::TextColored(fakeHeaderColor, "Planet Properties");
+
+        int order = static_cast<int>(selectedPlanet->order);
+        ImGui::RadioButton("Start planet", &order, 0);
+        ImGui::SameLine();
+        ImGui::RadioButton("Middle planet", &order, 1);
+        ImGui::SameLine();
+        ImGui::RadioButton("End planet", &order, 2);
+        selectedPlanet->order = static_cast<PlanetOrder>(order);
+
+        ImGui::Checkbox("Sun", &selectedPlanet->isSun);
+        ImGui::Checkbox("Has food", &selectedPlanet->hasFood);
+    }
+
+
+    // Show food-specific properties if this is a food
+    auto selectedFood = std::dynamic_pointer_cast<FoodModel>(selectedObj);
+    if (selectedFood)
+    {
+        ImGui::TextColored(fakeHeaderColor, "Food Properties");
+        ImGui::Checkbox("Cookable", &selectedFood->cookable);
+    }
+
+    ImGui::End();
+}
+
 static void showDemoStuff()
 {
     // Our state
@@ -344,4 +419,5 @@ void runEditor()
     showDemoStuff();
     showHelp();
     showLevelVisualization();
+    showPropertiesEditor();
 }
