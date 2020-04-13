@@ -104,6 +104,6 @@ $(EXE): $(OBJS)
 	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS)
 
 clean:
-	rm -f $(EXE) $(OBJS) *.d
+	rm -f $(EXE) $(OBJS) *.d imgui.ini
 
 -include $(OBJS:.o=.d)
