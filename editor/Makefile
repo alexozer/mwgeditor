@@ -57,7 +57,7 @@ ifeq ($(UNAME_S), Linux) #LINUX
 	LIBS += -lGL -ldl `sdl2-config --libs`
 
 	CXXFLAGS += `sdl2-config --cflags`
-	CFLAGS = $(CXXFLAGS)
+	CFLAGS := $(CXXFLAGS)
 endif
 
 ifeq ($(UNAME_S), Darwin) #APPLE
@@ -67,7 +67,7 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 
 	CXXFLAGS += `sdl2-config --cflags`
 	CXXFLAGS += -I/usr/local/include -I/opt/local/include
-	CFLAGS = $(CXXFLAGS)
+	CFLAGS := $(CXXFLAGS)
 endif
 
 ifeq ($(findstring MINGW,$(UNAME_S)),MINGW)
@@ -75,8 +75,10 @@ ifeq ($(findstring MINGW,$(UNAME_S)),MINGW)
    LIBS += -lgdi32 -lopengl32 -limm32 `pkg-config --static --libs sdl2`
 
    CXXFLAGS += `pkg-config --cflags sdl2`
-   CFLAGS = $(CXXFLAGS)
+   CFLAGS := $(CXXFLAGS)
 endif
+
+CXXFLAGS += -std=c++14
 
 ##---------------------------------------------------------------------
 ## BUILD RULES
