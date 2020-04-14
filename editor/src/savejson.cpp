@@ -166,6 +166,10 @@ void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel
     levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["numFood"]["type"] = "Node";
     levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["numFood"]["data"]["num"] = level->foods.size();
 
+    // Add fonts (unnecessary?)
+    levelJson["fonts"]["felt32"]["file"] = "fonts/MarkerFelt.ttf";
+    levelJson["fonts"]["felt32"]["size"] = 32;
+
     // Save json to file
     std::ofstream ofile(filename);
     ofile << std::setw(4) << levelJson << std::endl;
