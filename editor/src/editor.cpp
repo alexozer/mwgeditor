@@ -455,7 +455,7 @@ void initEditor()
 void runEditor()
 {
 //    showDemoStuff();
-    showHelp();
+//    showHelp();
     showLevelVisualization();
     showPropertiesEditor();
 }

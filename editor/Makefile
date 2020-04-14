@@ -21,7 +21,7 @@ SOURCES += libs/imgui/imgui.cpp libs/imgui/imgui_demo.cpp libs/imgui/imgui_draw.
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 
-CXXFLAGS = -Ilibs/imgui/examples/ -Ilibs/imgui/ -Ilibs/stb -Ilibs/json -Isrc/
+CXXFLAGS = -Ilibs/imgui/examples/ -Ilibs/imgui/ -Ilibs/stb -Ilibs/json -Ilibs/imfilebrowser -Isrc/
 CXXFLAGS += -g -Wall -Wformat -MD
 LIBS =
 
