@@ -41,7 +41,17 @@ static json genPlanetJson(const std::shared_ptr<PlanetModel>& planet, const TexT
     return planetJson;
 }
 
-static json genPlanetsJson(const std::shared_ptr<LevelModel>& level, const TexTable& texTable)
+static json genPlanetRingJson(const std::shared_ptr<PlanetModel>& planet, const TexTable& texTable)
+{
+    json j = genObjectJson(planet, texTable);
+    j["data"]["texture"] = "range";
+    j["data"]["cols"] = 5;
+    j["data"]["frame"] = 0;
+    j["data"]["scale"] = j["data"]["scale"].get<float>() * 3;
+    return j;
+}
+
+static std::pair<json, json> genPlanetsJson(const std::shared_ptr<LevelModel>& level, const TexTable& texTable)
 {
     // Find start planet and end planet (there should be at least 1 guaranteed)
     auto startIt = std::find_if(
@@ -62,24 +72,30 @@ static json genPlanetsJson(const std::shared_ptr<LevelModel>& level, const TexTa
     IM_ASSERT(endIt != level->planets.end());
     std::shared_ptr<PlanetModel> endPlanet = *endIt;
 
-    // Add planets to json
+    // Planets json
 
-    json planetsJson;
+    json planetsJson, planetRingsJson;
     planetsJson["type"] = "Node";
+    planetRingsJson["type"] = "Node";
+
     planetsJson["children"]["startPlanet"] = genPlanetJson(startPlanet, texTable);
     planetsJson["children"]["endPlanet"] = genPlanetJson(endPlanet, texTable);
+    planetRingsJson["children"]["startPlanetRange"] = genPlanetRingJson(startPlanet, texTable);
+    planetRingsJson["children"]["endPlanetRange"] = genPlanetRingJson(endPlanet, texTable);
 
     int planetIdx = 1;
     for (auto& planet : level->planets)
     {
         if (planet->order == PlanetOrder::MIDDLE)
         {
-            std::string planetName = "planet" + std::to_string(planetIdx++);
+            std::string planetName = "planet" + std::to_string(planetIdx);
+            std::string planetRangeName = "planet" + std::to_string(planetIdx++) + "Range";
             planetsJson["children"][planetName] = genPlanetJson(planet, texTable);
+            planetRingsJson["children"][planetRangeName] = genPlanetRingJson(planet, texTable);
         }
     }
 
-    return planetsJson;
+    return {planetsJson, planetRingsJson};
 }
 
 static json genFoodsJson(const std::shared_ptr<LevelModel>& level, const TexTable& texTable)
@@ -121,6 +137,9 @@ void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel
         }
     }
 
+    // Create table entry for gravity range texture
+    texTable["../assets/textures/range.png"] = "range";
+
     // Add texture table to json
     for (auto& item : texTable)
     {
@@ -130,7 +149,11 @@ void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel
     }
 
     // Add planets and foods
-    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["planets"] = genPlanetsJson(level, texTable);
+    auto planetJsonPair = genPlanetsJson(level, texTable);
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["planets"] = planetJsonPair.first;
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["planetRanges"] = planetJsonPair.second;
+
+    // Add foods
     levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["food"] = genFoodsJson(level, texTable);
 
     // Add player and customer
