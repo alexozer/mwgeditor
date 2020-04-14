@@ -12,12 +12,12 @@ using json = nlohmann::json;
 // Map of texture filename to "short name"
 typedef std::unordered_map<std::string, std::string> TexTable;
 
-json genVecJson(ImVec2 vec)
+static json genVecJson(ImVec2 vec)
 {
     return json::array({vec.x, vec.y});
 }
 
-json genObjectJson(const std::shared_ptr<ObjectModel>& obj, const TexTable& texTable)
+static json genObjectJson(const std::shared_ptr<ObjectModel>& obj, const TexTable& texTable)
 {
     return {
         {"type", "Animation"},
@@ -33,7 +33,7 @@ json genObjectJson(const std::shared_ptr<ObjectModel>& obj, const TexTable& texT
     };
 }
 
-json genPlanetJson(const std::shared_ptr<PlanetModel>& planet, const TexTable& texTable)
+static json genPlanetJson(const std::shared_ptr<PlanetModel>& planet, const TexTable& texTable)
 {
     json planetJson = genObjectJson(planet, texTable);
     planetJson["data"]["hasFood"] = planet->hasFood;
@@ -41,7 +41,7 @@ json genPlanetJson(const std::shared_ptr<PlanetModel>& planet, const TexTable& t
     return planetJson;
 }
 
-json genPlanetsJson(const std::shared_ptr<LevelModel>& level, const TexTable& texTable)
+static json genPlanetsJson(const std::shared_ptr<LevelModel>& level, const TexTable& texTable)
 {
     // Find start planet and end planet (there should be at least 1 guaranteed)
     auto startIt = std::find_if(
@@ -87,6 +87,8 @@ void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel
     // Create initial level json
     json levelJson;
 
+    std::string levelNumStr = "lv" + std::to_string(level->levelNumber);
+
     // Create texture table
     int texId = 0;
     TexTable texTable;
@@ -109,8 +111,17 @@ void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel
         levelJson["textures"][item.second]["file"] = fixedPath;
     }
 
-    // TODO use real level number
-    levelJson["scenes"]["lv1"]["children"]["game"]["children"]["planets"] = genPlanetsJson(level, texTable);
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["planets"] = genPlanetsJson(level, texTable);
+
+    // Add player and customer
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["customer"] = genObjectJson(level->customer, texTable);
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["player"] = genObjectJson(level->player, texTable);
+
+    // Add food and planet counts
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["numPlanets"]["type"] = "Node";
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["numPlanets"]["data"]["num"] = level->planets.size() - 2;
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["numFood"]["type"] = "Node";
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["numFood"]["data"]["num"] = level->foods.size();
 
     // Save json to file
     std::ofstream ofile(filename);
