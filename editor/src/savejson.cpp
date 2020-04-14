@@ -82,6 +82,24 @@ static json genPlanetsJson(const std::shared_ptr<LevelModel>& level, const TexTa
     return planetsJson;
 }
 
+static json genFoodsJson(const std::shared_ptr<LevelModel>& level, const TexTable& texTable)
+{
+    json foodListJson;
+    foodListJson["type"] = "Node";
+
+    for (size_t foodIdx = 0; foodIdx != level->foods.size(); ++foodIdx)
+    {
+        auto& food = level->foods[foodIdx];
+        json foodJson = genObjectJson(food, texTable);
+        foodJson["cookable"] = food->cookable;
+
+        std::string foodName = "food" + std::to_string(foodIdx + 1);
+        foodListJson["children"][foodName] = foodJson;
+    }
+
+    return foodListJson;
+}
+
 void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel> &level)
 {
     // Create initial level json
@@ -111,7 +129,9 @@ void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel
         levelJson["textures"][item.second]["file"] = fixedPath;
     }
 
+    // Add planets and foods
     levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["planets"] = genPlanetsJson(level, texTable);
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["food"] = genFoodsJson(level, texTable);
 
     // Add player and customer
     levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["customer"] = genObjectJson(level->customer, texTable);
