@@ -67,7 +67,7 @@ std::shared_ptr<FoodModel> loadJsonFood(const json& foodJson, const TexTable& te
     return foodModel;
 }
 
-std::shared_ptr<LevelModel> loadJsonLevel(std::string filename)
+std::shared_ptr<LevelModel> loadJsonLevel(const std::string& filename)
 {
     std::ifstream f(filename);
     json levelJson;

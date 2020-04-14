@@ -1,8 +1,10 @@
 #include "editor.h"
 #include "textures.h"
 #include "loadjson.h"
+#include "util.h"
 
 #include "imgui.h"
+#include "savejson.h"
 
 struct Canvas
 {
@@ -173,11 +175,7 @@ static std::shared_ptr<ObjectModel> findObjectAtScreenPos(ImVec2 pos)
 {
     ImVec2 worldPos = viz.screenToWorldSpace(pos);
 
-    std::vector<std::shared_ptr<ObjectModel>> allObjects;
-    allObjects.insert(allObjects.end(), level->planets.begin(), level->planets.end());
-    allObjects.insert(allObjects.end(), level->foods.begin(), level->foods.end());
-    allObjects.emplace_back(level->customer);
-    allObjects.emplace_back(level->player);
+    auto allObjects = getAllLevelObjects(level);
 
     for (auto obj : allObjects) {
         float scaledWidth = obj->frameSize().x * obj->scale;
@@ -319,6 +317,12 @@ static void showPropertiesEditor()
     ImGui::Button("Add planet");
     ImGui::SameLine();
     ImGui::Button("Add food");
+
+    // TODO remove
+    if (ImGui::Button("Export JSON"))
+    {
+        saveJsonLevel("poop.json", level);
+    }
 
     ImGui::Checkbox("Show gravity ranges", &showGravRanges);
 

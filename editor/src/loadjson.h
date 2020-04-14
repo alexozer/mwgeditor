@@ -3,4 +3,4 @@
 #include "levelmodel.h"
 #include <string>
 
-std::shared_ptr<LevelModel> loadJsonLevel(std::string filename);
+std::shared_ptr<LevelModel> loadJsonLevel(const std::string& filename);
