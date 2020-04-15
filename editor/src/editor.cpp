@@ -1,5 +1,4 @@
-#include "editor.h"
-#include "textures.h"
+#include "assetman.h"
 #include "loadjson.h"
 #include "util.h"
 #include "visualizer.h"
@@ -89,6 +88,10 @@ static void showPropertiesEditor()
     ImGui::Button("Add planet");
     ImGui::SameLine();
     ImGui::Button("Add food");
+    ImGui::SameLine();
+    ImGui::Button("Add player");
+    ImGui::SameLine();
+    ImGui::Button("Add customer");
 
     ImGui::Checkbox("Show gravity ranges", &g_showGravRanges);
 
@@ -103,7 +106,7 @@ static void showPropertiesEditor()
 
     ImGui::TextColored(FAKE_HEADER_COLOR, "Object Properties");
 
-    ImGui::Text("Texture filepath: %s", g_selectedObj->tex.filename.c_str());
+    ImGui::Text("Texture filepath: %s", g_assetMan.assetPathFromTexture(g_selectedObj->tex).c_str());
 
     // Is casting like this bad?
     ImGui::InputFloat2("Position", reinterpret_cast<float *>(&g_selectedObj->pos), "%.3f");
@@ -214,11 +217,9 @@ static void showHelp()
 
 void initEditor()
 {
-    IM_ASSERT(loadTextureFromFile("../assets/textures/range.png", g_gravRangeTex));
+    g_gravRangeTex = g_assetMan.textureFromAssetPath("textures/range.png");
     g_showGravRanges = true;
     s_fileDialog.SetTitle("Select file");
-
-//    openLevelJson("examples/level1.json");
 }
 
 void runEditor()

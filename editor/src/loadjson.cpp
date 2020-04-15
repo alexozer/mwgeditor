@@ -1,12 +1,14 @@
-#include <fstream>
-#include <iostream>
 #include "loadjson.h"
+#include "global.h"
 
 #include "json.hpp"
 
+#include <fstream>
+#include <iostream>
+
 using json = nlohmann::json;
 
-typedef std::unordered_map<std::string, Texture> TexTable;
+typedef std::unordered_map<std::string, std::shared_ptr<Texture>> TexTable;
 
 ImVec2 loadJsonCoord(const json& coordJson)
 {
@@ -85,10 +87,9 @@ std::shared_ptr<LevelModel> loadJsonLevel(const std::string& filename)
     {
         std::string shortName = texJson.key();
         std::string fileName = texJson.value()["file"].get<std::string>();
-        fileName = "../assets/" + fileName;
 
-        Texture tex{};
-        IM_ASSERT(loadTextureFromFile(fileName.c_str(), tex));
+        auto tex = g_assetMan.textureFromAssetPath(fileName);
+        assert(tex != nullptr);
         texTable.emplace(shortName, tex);
     }
 

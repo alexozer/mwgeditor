@@ -1,4 +1,4 @@
-#include "textures.h"
+#include "assetman.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -29,15 +29,19 @@ using namespace gl;
 #include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
 #endif
 
+#include <filesystem>
+#include <iostream>
+
+using std::filesystem::path;
+
 // Simple helper function to load an image into a OpenGL texture with common settings
-bool loadTextureFromFile(const char* filename, Texture& outTexture)
+static std::shared_ptr<Texture> loadTextureFromFile(const char* filename)
 {
     // Load from file
     int image_width = 0;
     int image_height = 0;
     unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
-    if (image_data == NULL)
-        return false;
+    if (image_data == NULL) return nullptr;
 
     // Create a OpenGL texture identifier
     GLuint image_texture;
@@ -53,10 +57,55 @@ bool loadTextureFromFile(const char* filename, Texture& outTexture)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
     stbi_image_free(image_data);
 
-    outTexture.id = reinterpret_cast<void *>(image_texture);
-    outTexture.width = image_width;
-    outTexture.height = image_height;
-    outTexture.filename = filename;
+    auto outTexture = std::make_shared<Texture>();
 
-    return true;
+    outTexture->id = reinterpret_cast<void *>(image_texture);
+    outTexture->width = image_width;
+    outTexture->height = image_height;
+
+    return outTexture;
+}
+
+static path assetPathRoot()
+{
+    return (std::filesystem::current_path().parent_path() / "assets").lexically_normal();
+}
+
+static path absToAssetPath(const path& absPath)
+{
+    return absPath.lexically_relative(assetPathRoot());
+}
+
+static path assetToAbsPath(const path& assetPath)
+{
+    return assetPathRoot() / assetPath;
+}
+
+std::shared_ptr<Texture> AssetMan::textureFromAssetPath(const std::filesystem::path &path)
+{
+    return textureFromAbsPath(assetToAbsPath(path));
+}
+
+std::shared_ptr<Texture> AssetMan::textureFromAbsPath(const std::filesystem::path &absPath)
+{
+    auto it = m_pathTexMap.find(absPath);
+    if (it == m_pathTexMap.end())
+    {
+        auto tex = loadTextureFromFile(absPath.c_str());
+        if (!tex)
+        {
+            throw std::runtime_error("Could not load texture file: " + absPath.string());
+        }
+        m_pathTexMap[absPath] = tex;
+        m_texPathMap[tex] = absPath;
+
+        return tex;
+    }
+
+    return it->second;
+}
+
+std::filesystem::path AssetMan::assetPathFromTexture(const std::shared_ptr<Texture> &texture)
+{
+    return m_texPathMap.at(texture);
 }

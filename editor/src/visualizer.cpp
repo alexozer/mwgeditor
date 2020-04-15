@@ -23,7 +23,7 @@ static void showLevelObject(ImDrawList *drawList, const std::shared_ptr<ObjectMo
     ImVec2 uv0(0, 0);
     ImVec2 uv1(object->uvEnd());
 
-    drawList->AddImage(object->tex.id, screenStart, screenEnd, uv0, uv1);
+    drawList->AddImage(object->tex->id, screenStart, screenEnd, uv0, uv1);
 
     // Show gravity range if it's a planet
     auto planet = std::dynamic_pointer_cast<PlanetModel>(object);
@@ -32,8 +32,8 @@ static void showLevelObject(ImDrawList *drawList, const std::shared_ptr<ObjectMo
         // All gravity ranges seem to have this hard-coded scale at the moment...
         constexpr float GRAV_RANGE_SCALE = 3.f;
 
-        float scaledGravWidth = g_gravRangeTex.width * object->scale / 5 * GRAV_RANGE_SCALE;
-        float scaledGravHeight = g_gravRangeTex.height * object->scale * GRAV_RANGE_SCALE;
+        float scaledGravWidth = g_gravRangeTex->width * object->scale / 5 * GRAV_RANGE_SCALE;
+        float scaledGravHeight = g_gravRangeTex->height * object->scale * GRAV_RANGE_SCALE;
 
         ImVec2 worldRangeStart(object->pos.x - scaledGravWidth / 2, object->pos.y - scaledGravHeight / 2);
         ImVec2 worldRangeEnd(object->pos.x + scaledGravWidth / 2, object->pos.y + scaledGravHeight / 2);
@@ -44,7 +44,7 @@ static void showLevelObject(ImDrawList *drawList, const std::shared_ptr<ObjectMo
         ImVec2 uv0(0.2, 0);
         ImVec2 uv1(0.4, 1);
 
-        drawList->AddImage(g_gravRangeTex.id, screenRangeStart, screenRangeEnd, uv0, uv1);
+        drawList->AddImage(g_gravRangeTex->id, screenRangeStart, screenRangeEnd, uv0, uv1);
     }
 }
 

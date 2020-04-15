@@ -1,7 +1,7 @@
 #pragma once
 
 #include "imgui.h"
-#include "textures.h"
+#include "assetman.h"
 
 #include <vector>
 #include <memory>
@@ -10,7 +10,7 @@ enum class PlanetOrder { START, MIDDLE, END };
 
 struct ObjectModel
 {
-    Texture tex;
+    std::shared_ptr<Texture> tex;
     float scale;
     ImVec2 pos;
     ImVec2 anchor;
@@ -22,8 +22,8 @@ struct ObjectModel
     {
         int rows = span / cols;
         if (span % cols != 0) rows++;
-        return ImVec2(static_cast<float>(tex.width) / cols,
-                      static_cast<float>(tex.height) / rows);
+        return ImVec2(static_cast<float>(tex->width) / cols,
+                      static_cast<float>(tex->height) / rows);
     }
 
     inline ImVec2 uvEnd()

@@ -30,6 +30,6 @@ add_executable(mwgeditor
         libs/imgui/imgui_demo.cpp
         libs/imgui/imgui_draw.cpp
         libs/imgui/imgui_widgets.cpp
-        libs/imgui/imstb_truetype.h src/editor.cpp src/editor.h libs/stb/stb_image.h src/textures.cpp src/textures.h src/levelmodel.h src/loadjson.cpp src/loadjson.h src/savejson.cpp src/savejson.h src/util.cpp src/util.h libs/imfilebrowser/imfilebrowser.h src/visualizer.cpp src/visualizer.h src/global.cpp src/global.h src/vizmodel.h)
+        libs/imgui/imstb_truetype.h src/editor.cpp src/editor.h libs/stb/stb_image.h src/assetman.cpp src/assetman.h src/levelmodel.h src/loadjson.cpp src/loadjson.h src/savejson.cpp src/savejson.h src/util.cpp src/util.h libs/imfilebrowser/imfilebrowser.h src/visualizer.cpp src/visualizer.h src/global.cpp src/global.h src/vizmodel.h)
 
 target_link_libraries(mwgeditor SDL2::SDL2)

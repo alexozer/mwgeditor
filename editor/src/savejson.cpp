@@ -1,5 +1,6 @@
 #include "savejson.h"
 #include "util.h"
+#include "global.h"
 
 #include "json.hpp"
 
@@ -9,8 +10,8 @@
 
 using json = nlohmann::json;
 
-// Map of texture filename to "short name"
-typedef std::unordered_map<std::string, std::string> TexTable;
+// Map of texture to short name
+typedef std::unordered_map<std::shared_ptr<Texture>, std::string> TexTable;
 
 static json genVecJson(ImVec2 vec)
 {
@@ -22,7 +23,7 @@ static json genObjectJson(const std::shared_ptr<ObjectModel>& obj, const TexTabl
     return {
         {"type", "Animation"},
         {"data", {
-                 {"texture", texTable.at(obj->tex.filename)},
+                 {"texture", texTable.at(obj->tex)},
                  {"cols", obj->cols},
                  {"span", obj->span},
                  {"frame", 0},
@@ -130,24 +131,17 @@ void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel
     auto allObjs = getAllLevelObjects(level);
     for (auto& obj : allObjs)
     {
-        std::string texPath = obj->tex.filename;
-        auto texTableIt = texTable.find(texPath);
+        auto texTableIt = texTable.find(obj->tex);
         if (texTableIt == texTable.end())
         {
-            texTable[texPath] = "tex" + std::to_string(texId++);
+            texTable[obj->tex] = "tex" + std::to_string(texId++);
         }
     }
-
-    // Create manual texture table entries
-    texTable["../assets/textures/range.png"] = "range";
-    texTable["../assets/textures/space"] = "space";
 
     // Add texture table to json
     for (auto& item : texTable)
     {
-        std::string prefix = "../assets/";
-        std::string fixedPath(item.first.substr(prefix.size(), item.first.size()));
-        levelJson["textures"][item.second]["file"] = fixedPath;
+        levelJson["textures"][item.second]["file"] = g_assetMan.assetPathFromTexture(item.first);
     }
 
     // Add planets and foods
@@ -172,7 +166,9 @@ void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel
     levelJson["fonts"]["felt32"]["file"] = "fonts/MarkerFelt.ttf";
     levelJson["fonts"]["felt32"]["size"] = 32;
 
-    // Add background manually
+    // Add some textures manually
+    levelJson["textures"]["range"]["file"] = "textures/range.png";
+    levelJson["textures"]["space"]["file"] = "textures/space.png";
     levelJson["textures"]["space"]["wrapS"] = "repeat";
     levelJson["textures"]["space"]["wrapT"] = "repeat";
     levelJson["scenes"][levelNumStr]["children"]["background"] = R"(
