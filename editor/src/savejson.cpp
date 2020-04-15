@@ -138,8 +138,9 @@ void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel
         }
     }
 
-    // Create table entry for gravity range texture
+    // Create manual texture table entries
     texTable["../assets/textures/range.png"] = "range";
+    texTable["../assets/textures/space"] = "space";
 
     // Add texture table to json
     for (auto& item : texTable)
@@ -170,6 +171,22 @@ void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel
     // Add fonts (unnecessary?)
     levelJson["fonts"]["felt32"]["file"] = "fonts/MarkerFelt.ttf";
     levelJson["fonts"]["felt32"]["size"] = 32;
+
+    // Add background manually
+    levelJson["textures"]["space"]["wrapS"] = "repeat";
+    levelJson["textures"]["space"]["wrapT"] = "repeat";
+    levelJson["scenes"][levelNumStr]["children"]["background"] = R"(
+     {
+        "type": "Image",
+        "data": {
+            "texture":  "space",
+            "position": [0, 0],
+            "scale":    0.5,
+            "polygon":  [0,0,0,2540,2540,2540,4500,2540,4500,0,0,0],
+            "anchor":   [0.5,0.5]
+        }
+    }
+    )"_json;
 
     // Save json to file
     std::ofstream ofile(filename);
