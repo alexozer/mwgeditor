@@ -24,6 +24,7 @@ static json genObjectJson(const std::shared_ptr<ObjectModel>& obj, const TexTabl
         {"data", {
                  {"texture", texTable.at(obj->tex.filename)},
                  {"cols", obj->cols},
+                 {"span", obj->span},
                  {"frame", 0},
                  {"scale", obj->scale},
                  {"position", genVecJson(obj->pos)},
@@ -107,7 +108,7 @@ static json genFoodsJson(const std::shared_ptr<LevelModel>& level, const TexTabl
     {
         auto& food = level->foods[foodIdx];
         json foodJson = genObjectJson(food, texTable);
-        foodJson["cookable"] = food->cookable;
+        foodJson["data"]["cookable"] = food->cookable;
 
         std::string foodName = "food" + std::to_string(foodIdx + 1);
         foodListJson["children"][foodName] = foodJson;

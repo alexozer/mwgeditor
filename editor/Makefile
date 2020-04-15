@@ -78,7 +78,7 @@ ifeq ($(findstring MINGW,$(UNAME_S)),MINGW)
    CFLAGS := $(CXXFLAGS)
 endif
 
-CXXFLAGS += -std=c++14
+CXXFLAGS += -std=c++17
 
 ##---------------------------------------------------------------------
 ## BUILD RULES

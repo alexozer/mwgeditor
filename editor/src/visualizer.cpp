@@ -17,8 +17,8 @@ static void showLevelObject(ImDrawList *drawList, const std::shared_ptr<ObjectMo
     ImVec2 worldTexEnd(object->pos.x + scaledWidth / 2,
                        object->pos.y + scaledHeight / 2);
 
-    ImVec2 screenStart = viz.worldToScreenSpace(worldTexStart);
-    ImVec2 screenEnd = viz.worldToScreenSpace(worldTexEnd);
+    ImVec2 screenStart = g_viz.worldToScreenSpace(worldTexStart);
+    ImVec2 screenEnd = g_viz.worldToScreenSpace(worldTexEnd);
 
     ImVec2 uv0(0, 0);
     ImVec2 uv1(object->uvEnd());
@@ -38,8 +38,8 @@ static void showLevelObject(ImDrawList *drawList, const std::shared_ptr<ObjectMo
         ImVec2 worldRangeStart(object->pos.x - scaledGravWidth / 2, object->pos.y - scaledGravHeight / 2);
         ImVec2 worldRangeEnd(object->pos.x + scaledGravWidth / 2, object->pos.y + scaledGravHeight / 2);
 
-        ImVec2 screenRangeStart = viz.worldToScreenSpace(worldRangeStart);
-        ImVec2 screenRangeEnd = viz.worldToScreenSpace(worldRangeEnd);
+        ImVec2 screenRangeStart = g_viz.worldToScreenSpace(worldRangeStart);
+        ImVec2 screenRangeEnd = g_viz.worldToScreenSpace(worldRangeEnd);
 
         ImVec2 uv0(0.2, 0);
         ImVec2 uv1(0.4, 1);
@@ -49,8 +49,8 @@ static void showLevelObject(ImDrawList *drawList, const std::shared_ptr<ObjectMo
 }
 
 static void showLevelGrid(ImDrawList *drawList) {
-    ImVec2 worldStart = viz.screenToWorldSpace(viz.getCanvas().start);
-    ImVec2 worldEnd = viz.screenToWorldSpace(viz.getCanvas().end);
+    ImVec2 worldStart = g_viz.screenToWorldSpace(g_viz.getCanvas().start);
+    ImVec2 worldEnd = g_viz.screenToWorldSpace(g_viz.getCanvas().end);
 
     constexpr float gridSpacing = 100.f;
 
@@ -61,22 +61,22 @@ static void showLevelGrid(ImDrawList *drawList) {
 
     for (float x = worldStart.x; x < worldEnd.x; x += gridSpacing)
     {
-        ImVec2 p1 = viz.worldToScreenSpace(ImVec2(x, 0));
-        p1.y = viz.getCanvas().start.y;
+        ImVec2 p1 = g_viz.worldToScreenSpace(ImVec2(x, 0));
+        p1.y = g_viz.getCanvas().start.y;
 
-        ImVec2 p2 = viz.worldToScreenSpace(ImVec2(x, 0));
-        p2.y = viz.getCanvas().end.y;
+        ImVec2 p2 = g_viz.worldToScreenSpace(ImVec2(x, 0));
+        p2.y = g_viz.getCanvas().end.y;
 
         drawList->AddLine(p1, p2, color);
     }
 
     for (float y = worldStart.y; y < worldEnd.y; y += gridSpacing)
     {
-        ImVec2 p1 = viz.worldToScreenSpace(ImVec2(0, y));
-        p1.x = viz.getCanvas().start.x;
+        ImVec2 p1 = g_viz.worldToScreenSpace(ImVec2(0, y));
+        p1.x = g_viz.getCanvas().start.x;
 
-        ImVec2 p2 = viz.worldToScreenSpace(ImVec2(0, y));
-        p2.x = viz.getCanvas().end.x;
+        ImVec2 p2 = g_viz.worldToScreenSpace(ImVec2(0, y));
+        p2.x = g_viz.getCanvas().end.x;
 
         drawList->AddLine(p1, p2, color);
     }
@@ -84,7 +84,7 @@ static void showLevelGrid(ImDrawList *drawList) {
 
 static std::shared_ptr<ObjectModel> findObjectAtScreenPos(ImVec2 pos)
 {
-    ImVec2 worldPos = viz.screenToWorldSpace(pos);
+    ImVec2 worldPos = g_viz.screenToWorldSpace(pos);
 
     auto allObjects = getAllLevelObjects(g_level);
 
@@ -145,11 +145,11 @@ static void handleDraggingSpace()
     {
         isDraggingSpace = true;
         mouseDownScreenPos = currMouseScreenPos;
-        oldVizWorldPos = viz.getWorldPos();
+        oldVizWorldPos = g_viz.getWorldPos();
     }
     if (isDraggingSpace)
     {
-        viz.setWorldPos(ImVec2(oldVizWorldPos.x + mouseDownScreenPos.x - currMouseScreenPos.x,
+        g_viz.setWorldPos(ImVec2(oldVizWorldPos.x + mouseDownScreenPos.x - currMouseScreenPos.x,
                                oldVizWorldPos.y + mouseDownScreenPos.y - currMouseScreenPos.y));
         if (!ImGui::IsMouseDown(0)) isDraggingSpace = false;
     }
@@ -171,8 +171,8 @@ void showLevelObjectSelection(ImDrawList *drawList)
         ImVec2 worldTexEnd(g_selectedObj->pos.x + scaledWidth / 2,
                            g_selectedObj->pos.y + scaledHeight / 2);
 
-        ImVec2 screenStart = viz.worldToScreenSpace(worldTexStart);
-        ImVec2 screenEnd = viz.worldToScreenSpace(worldTexEnd);
+        ImVec2 screenStart = g_viz.worldToScreenSpace(worldTexStart);
+        ImVec2 screenEnd = g_viz.worldToScreenSpace(worldTexEnd);
 
         ImVec2 uv0(0, 0);
         ImVec2 uv1(g_selectedObj->uvEnd());
@@ -190,10 +190,16 @@ void showLevelVisualization()
 
     ImGui::Begin("Level Visualization");
 
+    if (!g_level)
+    {
+        ImGui::End();
+        return;
+    }
+
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-    viz.generateWindowCanvas();
-    ImGui::InvisibleButton("canvas", viz.getCanvas().size); // Used to detect clicks inside window
+    g_viz.generateWindowCanvas();
+    ImGui::InvisibleButton("canvas", g_viz.getCanvas().size); // Used to detect clicks inside window
 
     handleDraggingObject();
     handleDraggingSpace();

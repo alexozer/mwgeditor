@@ -4,29 +4,91 @@
 #include "util.h"
 #include "visualizer.h"
 #include "global.h"
+#include "savejson.h"
 
 #include "imgui.h"
-#include "savejson.h"
+#include "imfilebrowser.h"
+
+static ImGui::FileBrowser s_fileDialog;
+
+const static ImVec4 FAKE_HEADER_COLOR(0.4f, 0.4f, 1.0f, 1.0f);
+
+static void openLevelJson(const std::string& jsonFilename)
+{
+    g_jsonFilename = jsonFilename;
+    g_level = loadJsonLevel(jsonFilename);
+
+    // Initially center on the start planet
+    // Or else the initial position is (0, 0) I guess
+    for (auto& planet : g_level->planets)
+    {
+        if (planet->order == PlanetOrder::START)
+        {
+            g_viz.setWorldPos(planet->pos);
+            g_selectedObj = planet;
+        }
+    }
+}
+
+static void showFileJsonGui()
+{
+    if (g_level)
+    {
+        std::string file = std::filesystem::path(g_jsonFilename).filename().string();
+        ImGui::TextColored(FAKE_HEADER_COLOR, "JSON loaded: %s", file.c_str());
+    } else
+    {
+        ImGui::TextColored(FAKE_HEADER_COLOR, "No JSON file loaded");
+    }
+
+    if (ImGui::Button("Open"))
+    {
+        s_fileDialog.SetTitle("Open Level JSON");
+        auto path = std::filesystem::current_path().parent_path() / "assets" / "json";
+        s_fileDialog.SetPwd(path);
+        s_fileDialog.SetTypeFilters({".json"});
+        s_fileDialog.Open();
+    }
+
+    s_fileDialog.Display();
+
+    if (s_fileDialog.HasSelected())
+    {
+        openLevelJson(s_fileDialog.GetSelected().string());
+        s_fileDialog.ClearSelected();
+    }
+
+    if (g_level)
+    {
+        ImGui::SameLine();
+        if (ImGui::Button("Save"))
+        {
+            saveJsonLevel(g_jsonFilename, g_level);
+        }
+    }
+}
 
 static void showPropertiesEditor()
 {
-    ImVec4 fakeHeaderColor(0.4f, 0.4f, 1.0f, 1.0f);
-
     ImGui::Begin("Properties Editor");
 
-    ImGui::TextColored(fakeHeaderColor, "Level Properties");
+    showFileJsonGui();
+    ImGui::Separator();
+
+    ImGui::TextColored(FAKE_HEADER_COLOR, "Level Properties");
+
+    if (!g_level)
+    {
+        ImGui::Text("No JSON level loaded");
+        ImGui::End();
+        return;
+    }
 
     ImGui::InputInt("Level number", &g_level->levelNumber);
 
     ImGui::Button("Add planet");
     ImGui::SameLine();
     ImGui::Button("Add food");
-
-    // TODO remove
-    if (ImGui::Button("Export JSON"))
-    {
-        saveJsonLevel("poop.json", g_level);
-    }
 
     ImGui::Checkbox("Show gravity ranges", &g_showGravRanges);
 
@@ -39,7 +101,7 @@ static void showPropertiesEditor()
         return;
     }
 
-    ImGui::TextColored(fakeHeaderColor, "Object Properties");
+    ImGui::TextColored(FAKE_HEADER_COLOR, "Object Properties");
 
     ImGui::Text("Texture filepath: %s", g_selectedObj->tex.filename.c_str());
 
@@ -64,7 +126,7 @@ static void showPropertiesEditor()
     auto selectedPlanet = std::dynamic_pointer_cast<PlanetModel>(g_selectedObj);
     if (selectedPlanet)
     {
-        ImGui::TextColored(fakeHeaderColor, "Planet Properties");
+        ImGui::TextColored(FAKE_HEADER_COLOR, "Planet Properties");
 
         int order = static_cast<int>(selectedPlanet->order);
         ImGui::RadioButton("Start planet", &order, 0);
@@ -83,7 +145,7 @@ static void showPropertiesEditor()
     auto selectedFood = std::dynamic_pointer_cast<FoodModel>(g_selectedObj);
     if (selectedFood)
     {
-        ImGui::TextColored(fakeHeaderColor, "Food Properties");
+        ImGui::TextColored(FAKE_HEADER_COLOR, "Food Properties");
         ImGui::Checkbox("Cookable", &selectedFood->cookable);
     }
 
@@ -152,27 +214,16 @@ static void showHelp()
 
 void initEditor()
 {
-    g_level = loadJsonLevel("examples/level1.json");
-
-    // Initially center on the start planet
-    // Or else the initial position is (0, 0) I guess
-    for (auto& planet : g_level->planets)
-    {
-        if (planet->order == PlanetOrder::START)
-        {
-            viz.setWorldPos(planet->pos);
-            g_selectedObj = planet;
-        }
-    }
-
     IM_ASSERT(loadTextureFromFile("../assets/textures/range.png", g_gravRangeTex));
     g_showGravRanges = true;
-}
+    s_fileDialog.SetTitle("Select file");
 
+//    openLevelJson("examples/level1.json");
+}
 
 void runEditor()
 {
-//    showDemoStuff();
+    ImGui::ShowDemoWindow();
 //    showHelp();
     showLevelVisualization();
     showPropertiesEditor();
