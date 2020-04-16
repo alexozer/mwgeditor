@@ -13,6 +13,25 @@ using json = nlohmann::json;
 // Map of texture to short name
 typedef std::unordered_map<std::shared_ptr<Texture>, std::string> TexTable;
 
+std::string validateLevelForExport()
+{
+    if (!g_level->player) return "Level must contain a player";
+    if (!g_level->customer) return "Level must contain a customer";
+
+    int startPlanets = 0;
+    int endPlanets = 0;
+    for (auto& planet : g_level->planets)
+    {
+        if (planet->order == PlanetOrder::START) startPlanets++;
+        if (planet->order == PlanetOrder::END) endPlanets++;
+    }
+
+    if (startPlanets != 1) return "Level must contain a single starting planet.\nThere are currently: " + std::to_string(startPlanets);
+    if (endPlanets != 1) return "Level must contain a single ending planet.\nThere are currently: " + std::to_string(endPlanets);
+
+    return "";
+}
+
 static json genVecJson(ImVec2 vec)
 {
     return json::array({vec.x, vec.y});

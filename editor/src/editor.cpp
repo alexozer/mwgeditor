@@ -71,12 +71,28 @@ static void showJsonFileState()
         openLevelJson(levelJsonPath);
     }
 
+    static std::string validateMsg;
+
     if (g_level)
     {
         ImGui::SameLine();
         if (ImGui::Button("Save"))
         {
-            saveJsonLevel(g_jsonFilename, g_level);
+            validateMsg = validateLevelForExport();
+            if (!validateMsg.empty())
+            {
+                ImGui::OpenPopup("Cannot save level");
+            } else
+            {
+                saveJsonLevel(g_jsonFilename, g_level);
+            }
+        }
+
+        if (ImGui::BeginPopupModal("Cannot save level"))
+        {
+            ImGui::Text("Cannot save level: %s", validateMsg.c_str());
+            if (ImGui::Button("Ok")) ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
         }
     }
 }
