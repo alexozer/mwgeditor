@@ -29,7 +29,32 @@ static void openLevelJson(const std::string& jsonFilename)
     }
 }
 
-static void showFileJsonGui()
+static std::string getFileSelection(const std::string& button, const std::string& windowTitle, const std::filesystem::path& path)
+{
+    // Hackily use the button text as the ID of the file type being selected
+    static std::string id;
+
+    if (ImGui::Button(button.c_str()))
+    {
+        s_fileDialog.SetTitle(windowTitle);
+        s_fileDialog.SetPwd(path);
+        s_fileDialog.Open();
+        id = button;
+    }
+
+    s_fileDialog.Display();
+
+    if (s_fileDialog.HasSelected() && id == button)
+    {
+        std::string ret = s_fileDialog.GetSelected().string();
+        s_fileDialog.ClearSelected();
+        return ret;
+    }
+
+    return "";
+}
+
+static void showJsonFileState()
 {
     if (g_level)
     {
@@ -40,21 +65,10 @@ static void showFileJsonGui()
         ImGui::TextColored(FAKE_HEADER_COLOR, "No JSON file loaded");
     }
 
-    if (ImGui::Button("Open"))
+    std::string levelJsonPath = getFileSelection("Open", "Open JSON Level", "../assets/json");
+    if (levelJsonPath.size() != 0)
     {
-        s_fileDialog.SetTitle("Open Level JSON");
-        auto path = std::filesystem::current_path().parent_path() / "assets" / "json";
-        s_fileDialog.SetPwd(path);
-        s_fileDialog.SetTypeFilters({".json"});
-        s_fileDialog.Open();
-    }
-
-    s_fileDialog.Display();
-
-    if (s_fileDialog.HasSelected())
-    {
-        openLevelJson(s_fileDialog.GetSelected().string());
-        s_fileDialog.ClearSelected();
+        openLevelJson(levelJsonPath);
     }
 
     if (g_level)
@@ -67,44 +81,111 @@ static void showFileJsonGui()
     }
 }
 
-static void showPropertiesEditor()
+static void showLevelProperties()
 {
-    ImGui::Begin("Properties Editor");
-
-    showFileJsonGui();
-    ImGui::Separator();
-
     ImGui::TextColored(FAKE_HEADER_COLOR, "Level Properties");
 
     if (!g_level)
     {
         ImGui::Text("No JSON level loaded");
-        ImGui::End();
         return;
     }
 
     ImGui::InputInt("Level number", &g_level->levelNumber);
 
-    ImGui::Button("Add planet");
+    std::filesystem::path texDirPath = std::filesystem::current_path().parent_path() / "assets" / "textures";
+    texDirPath = texDirPath.lexically_normal();
+
+    // Add planet button
+    std::string texPath = getFileSelection("Add planet", "Select planet texture", texDirPath);
+    if (!texPath.empty())
+    {
+        auto planet = std::make_shared<PlanetModel>();
+        planet->tex = g_assetMan.textureFromAbsPath(texPath);
+        planet->pos = g_viz.getWorldPos();
+        planet->anchor = ImVec2(0.5, 0.5);
+        planet->scale = 0.5;
+        planet->cols = 2;
+        planet->span = 2;
+        planet->isSun = false;
+        planet->hasFood = false;
+        planet->order = PlanetOrder::MIDDLE;
+
+        g_level->planets.emplace_back(planet);
+        g_selectedObj = planet;
+    }
     ImGui::SameLine();
-    ImGui::Button("Add food");
+
+    // Add food button
+    texPath = getFileSelection("Add food", "Select food texture", texDirPath);
+    if (!texPath.empty())
+    {
+        auto food = std::make_shared<FoodModel>();
+        food->tex = g_assetMan.textureFromAbsPath(texPath);
+        food->pos = g_viz.getWorldPos();
+        food->anchor = ImVec2(0.5, 0.5);
+        food->scale = 0.5;
+        food->cols = 1;
+        food->span = 1;
+        food->cookable = false;
+
+        g_level->foods.emplace_back(food);
+        g_selectedObj = food;
+    }
     ImGui::SameLine();
-    ImGui::Button("Add player");
+
+    // Add player button
+    texPath = getFileSelection("Add player", "Select player texture", texDirPath);
+    if (!texPath.empty())
+    {
+        auto player = std::make_shared<ObjectModel>();
+        player->tex = g_assetMan.textureFromAbsPath(texPath);
+        player->pos = g_viz.getWorldPos();
+        player->anchor = ImVec2(0.5, 0.5);
+        player->scale = 0.5;
+        player->cols = 1;
+        player->span = 1;
+
+        g_level->player = player;
+        g_selectedObj = player;
+    }
     ImGui::SameLine();
-    ImGui::Button("Add customer");
+
+    texPath = getFileSelection("Add customer", "Select player texture", texDirPath);
+    if (!texPath.empty())
+    {
+        auto customer = std::make_shared<ObjectModel>();
+        customer->tex = g_assetMan.textureFromAbsPath(texPath);
+        customer->pos = g_viz.getWorldPos();
+        customer->anchor = ImVec2(0.5, 0.5);
+        customer->scale = 0.5;
+        customer->cols = 1;
+        customer->span = 1;
+
+        g_level->customer = customer;
+        g_selectedObj = customer;
+    }
 
     ImGui::Checkbox("Show gravity ranges", &g_showGravRanges);
+}
 
+static void showPropertiesEditor()
+{
+    ImGui::Begin("Properties Editor");
+
+    showJsonFileState();
     ImGui::Separator();
 
+    showLevelProperties();
+    ImGui::Separator();
+
+    ImGui::TextColored(FAKE_HEADER_COLOR, "Object Properties");
     if (!g_selectedObj)
     {
         ImGui::Text("No selected object");
         ImGui::End();
         return;
     }
-
-    ImGui::TextColored(FAKE_HEADER_COLOR, "Object Properties");
 
     ImGui::Text("Texture filepath: %s", g_assetMan.assetPathFromTexture(g_selectedObj->tex).c_str());
 
@@ -151,19 +232,6 @@ static void showPropertiesEditor()
         ImGui::TextColored(FAKE_HEADER_COLOR, "Food Properties");
         ImGui::Checkbox("Cookable", &selectedFood->cookable);
     }
-
-    ImGui::End();
-}
-
-static void showHelp()
-{
-    ImGui::Begin("Help");
-
-    ImGui::Text("LEVEL VISUALIZATION:");
-    ImGui::BulletText("Click a planet, food, or other object to select it");
-    ImGui::BulletText("Click and drag a planet, food, or other object to change its position in the level");
-    ImGui::BulletText("Click and drag in empty space to pan the level");
-    ImGui::Separator();
 
     ImGui::End();
 }
@@ -225,7 +293,6 @@ void initEditor()
 void runEditor()
 {
     ImGui::ShowDemoWindow();
-//    showHelp();
     showLevelVisualization();
     showPropertiesEditor();
 }
