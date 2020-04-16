@@ -9,6 +9,8 @@
 
 static void showLevelObject(ImDrawList *drawList, const std::shared_ptr<ObjectModel>& object)
 {
+    if (!object) return;
+
     float scaledWidth = object->frameSize().x * object->scale;
     float scaledHeight = object->frameSize().y * object->scale;
 

@@ -81,6 +81,19 @@ static void showJsonFileState()
     }
 }
 
+static bool showRedButton(const std::string& label)
+{
+    ImGui::PushID(0);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0/7.0f, 0.6f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0/7.0f, 0.7f, 0.7f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0/7.0f, 0.8f, 0.8f));
+    bool ret = ImGui::Button(label.c_str());
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    return ret;
+}
+
 static void showLevelProperties()
 {
     ImGui::TextColored(FAKE_HEADER_COLOR, "Level Properties");
@@ -197,12 +210,21 @@ static void showPropertiesEditor()
     ImGui::InputInt("Texture columns", &g_selectedObj->cols);
     ImGui::InputInt("Texture span", &g_selectedObj->span);
 
-    // Dummies for now
-    bool isCustomer = g_selectedObj == g_level->customer;
-    bool isPlayer = g_selectedObj == g_level->player;
-    ImGui::Checkbox("Is player", &isPlayer);
-    ImGui::SameLine();
-    ImGui::Checkbox("Is customer", &isCustomer);
+    // Handle object deletion
+    if (g_selectedObj && showRedButton("Delete object"))
+    {
+        if (g_selectedObj == g_level->player) g_level->player = nullptr;
+        else if (g_selectedObj == g_level->customer) g_level->customer = nullptr;
+        else
+        {
+            auto& planets = g_level->planets;
+            auto& foods = g_level->foods;
+            planets.erase(std::remove(planets.begin(), planets.end(), g_selectedObj), planets.end());
+            foods.erase(std::remove(foods.begin(), foods.end(), g_selectedObj), foods.end());
+        }
+
+        g_selectedObj = nullptr;
+    }
 
     ImGui::Separator();
 
@@ -224,13 +246,22 @@ static void showPropertiesEditor()
         ImGui::Checkbox("Has food", &selectedPlanet->hasFood);
     }
 
-
     // Show food-specific properties if this is a food
     auto selectedFood = std::dynamic_pointer_cast<FoodModel>(g_selectedObj);
     if (selectedFood)
     {
         ImGui::TextColored(FAKE_HEADER_COLOR, "Food Properties");
         ImGui::Checkbox("Cookable", &selectedFood->cookable);
+    }
+
+    if (g_selectedObj == g_level->player)
+    {
+        ImGui::TextColored(FAKE_HEADER_COLOR, "Player properties");
+    }
+
+    if (g_selectedObj == g_level->customer)
+    {
+        ImGui::TextColored(FAKE_HEADER_COLOR, "Customer properties");
     }
 
     ImGui::End();
