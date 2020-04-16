@@ -1,3 +1,3 @@
 #pragma once
 
-void showLevelVisualization();
+void showLevelVisualizer();

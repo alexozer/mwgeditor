@@ -183,14 +183,14 @@ void showLevelObjectSelection(ImDrawList *drawList)
     }
 }
 
-void showLevelVisualization()
+void showLevelVisualizer()
 {
     // Set a default size for this window for first run, in case we have no .ini
     // Necessary in this case I believe because we don't add any actual content to the window besides the
     // implicitly-sized drawing list, so it's otherwise empty
     ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
 
-    ImGui::Begin("Level Visualization");
+    ImGui::Begin("Level Visualizer");
 
     if (!g_level)
     {
