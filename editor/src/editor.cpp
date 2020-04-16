@@ -136,7 +136,7 @@ static void showLevelProperties()
         planet->scale = 0.5;
         planet->cols = 2;
         planet->span = 2;
-        planet->isSun = false;
+        planet->type = PlanetType::NORMAL;
         planet->hasFood = false;
         planet->order = PlanetOrder::MIDDLE;
 
@@ -258,7 +258,16 @@ static void showPropertiesEditor()
         ImGui::RadioButton("End planet", &order, 2);
         selectedPlanet->order = static_cast<PlanetOrder>(order);
 
-        ImGui::Checkbox("Sun", &selectedPlanet->isSun);
+        int type = static_cast<int>(selectedPlanet->type);
+        ImGui::RadioButton("Normal", &type, 0);
+        ImGui::SameLine();
+        ImGui::RadioButton("Sun", &type, 1);
+        ImGui::SameLine();
+        ImGui::RadioButton("Blackhole", &type, 2);
+        ImGui::SameLine();
+        ImGui::RadioButton("Storage", &type, 3);
+        selectedPlanet->type = static_cast<PlanetType>(type);
+
         ImGui::Checkbox("Has food", &selectedPlanet->hasFood);
     }
 
