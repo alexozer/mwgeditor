@@ -1,0 +1,166 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXFileReference section */
+		5E068F53244421140076F2CF /* go.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = go.sh; sourceTree = "<group>"; };
+		5E068F54244421140076F2CF /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		5E068F55244421140076F2CF /* .DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = .DS_Store; sourceTree = "<group>"; };
+		5E068F56244421140076F2CF /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		5E068F57244421140076F2CF /* libs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = libs; sourceTree = "<group>"; };
+		5E068F58244421140076F2CF /* editor.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = editor.xcodeproj; sourceTree = "<group>"; };
+		5E068F5B244421140076F2CF /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		5E068F5C244421140076F2CF /* examples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = examples; sourceTree = "<group>"; };
+		5E068F5D244421140076F2CF /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		5E068F4D244421140076F2CF = {
+			isa = PBXGroup;
+			children = (
+				5E068F53244421140076F2CF /* go.sh */,
+				5E068F54244421140076F2CF /* CMakeLists.txt */,
+				5E068F55244421140076F2CF /* .DS_Store */,
+				5E068F56244421140076F2CF /* Makefile */,
+				5E068F57244421140076F2CF /* libs */,
+				5E068F58244421140076F2CF /* editor.xcodeproj */,
+				5E068F5B244421140076F2CF /* .gitignore */,
+				5E068F5C244421140076F2CF /* examples */,
+				5E068F5D244421140076F2CF /* src */,
+			);
+			sourceTree = "<group>";
+		};
+		5E068F59244421140076F2CF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		5E068F52244421140076F2CF /* editor */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 5E068F5F244421140076F2CF /* Build configuration list for PBXLegacyTarget "editor" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = /Users/vivian/Desktop/cs4152/CS4152_Group_5/editor;
+			dependencies = (
+			);
+			name = editor;
+			passBuildSettingsInEnvironment = 1;
+			productName = editor;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		5E068F4E244421140076F2CF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 5E068F51244421140076F2CF /* Build configuration list for PBXProject "editor 2" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5E068F4D244421140076F2CF;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 5E068F59244421140076F2CF /* Products */;
+					ProjectRef = 5E068F58244421140076F2CF /* editor.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				5E068F52244421140076F2CF /* editor */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		5E068F4F244421140076F2CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		5E068F50244421140076F2CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		5E068F60244421140076F2CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = editor;
+			};
+			name = Debug;
+		};
+		5E068F61244421140076F2CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = editor;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5E068F51244421140076F2CF /* Build configuration list for PBXProject "editor 2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5E068F4F244421140076F2CF /* Debug */,
+				5E068F50244421140076F2CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5E068F5F244421140076F2CF /* Build configuration list for PBXLegacyTarget "editor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5E068F60244421140076F2CF /* Debug */,
+				5E068F61244421140076F2CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5E068F4E244421140076F2CF /* Project object */;
+}

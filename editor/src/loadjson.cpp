@@ -53,7 +53,19 @@ std::shared_ptr<PlanetModel> loadJsonPlanet(const json& planetJson, const TexTab
     loadObjectModel(planetJson, texTable, planetModel);
 
     planetModel->hasFood = planetJson["data"]["hasFood"].get<bool>();
-    planetModel->isSun = planetJson["data"]["isSun"].get<bool>();
+
+    auto sunIt = planetJson["data"].find("isSun");
+    auto blackHoleIt = planetJson["data"].find("isBlackHole");
+    auto storageIt = planetJson["data"].find("isStorage");
+
+    bool isSun = sunIt != planetJson["data"].end() && sunIt->get<bool>();
+    bool isBlackHole = blackHoleIt != planetJson["data"].end() && blackHoleIt->get<bool>();
+    bool isStorage = storageIt != planetJson["data"].end() && storageIt->get<bool>();
+
+    if (isSun) planetModel->type = PlanetType::SUN;
+    else if (isBlackHole) planetModel->type = PlanetType::BLACKHOLE;
+    else if (isStorage) planetModel->type = PlanetType::STORAGE;
+    else planetModel->type = PlanetType::NORMAL;
 
     return planetModel;
 }

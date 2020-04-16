@@ -7,6 +7,7 @@
 #include <memory>
 
 enum class PlanetOrder { START, MIDDLE, END };
+enum class PlanetType { NORMAL, SUN, BLACKHOLE, STORAGE };
 
 struct ObjectModel
 {
@@ -38,8 +39,8 @@ struct ObjectModel
 
 struct PlanetModel : public ObjectModel
 {
-    bool isSun;
     bool hasFood;
+    PlanetType type;
     PlanetOrder order;
 };
 
