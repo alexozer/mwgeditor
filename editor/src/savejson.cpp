@@ -58,7 +58,9 @@ static json genPlanetJson(const std::shared_ptr<PlanetModel>& planet, const TexT
 {
     json planetJson = genObjectJson(planet, texTable);
     planetJson["data"]["hasFood"] = planet->hasFood;
-    planetJson["data"]["isSun"] = planet->isSun;
+    planetJson["data"]["isSun"] = planet->type == PlanetType::SUN;
+    planetJson["data"]["isStorage"] = planet->type == PlanetType::STORAGE;
+    planetJson["data"]["isBlackHole"] = planet->type == PlanetType::BLACKHOLE;
     return planetJson;
 }
 
