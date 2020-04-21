@@ -307,7 +307,7 @@ static void showRecipeEditor()
 
     for (auto& food : g_level->foods)
     {
-        std::string basicName = g_assetMan.assetPathFromTexture(food->tex).filename();
+        std::string basicName = g_assetMan.assetPathFromTexture(food->tex).filename().u8string();
         foodNames.push_back(basicName);
     }
     for (auto& name : foodNames)
@@ -352,7 +352,7 @@ static void showRecipeEditor()
 
 void initEditor()
 {
-    g_gravRangeTex = g_assetMan.textureFromAssetPath("textures/range.png");
+    g_gravRangeTex = g_assetMan.textureFromAssetPath(std::filesystem::path("textures") / "range.png");
     g_showGravRanges = true;
     s_fileDialog.SetTitle("Select file");
 }

@@ -99,8 +99,10 @@ std::shared_ptr<LevelModel> loadJsonLevel(const std::string& filename)
     {
         std::string shortName = texJson.key();
         std::string fileName = texJson.value()["file"].get<std::string>();
+        std::filesystem::path assetPath(fileName);
+        assetPath.make_preferred();
 
-        auto tex = g_assetMan.textureFromAssetPath(fileName);
+        auto tex = g_assetMan.textureFromAssetPath(assetPath);
         assert(tex != nullptr);
         texTable.emplace(shortName, tex);
     }

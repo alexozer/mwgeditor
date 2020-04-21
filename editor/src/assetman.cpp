@@ -3,8 +3,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include <SDL.h>
-
 // About Desktop OpenGL function loaders:
 //  Modern desktop OpenGL doesn't have a standard portable header file to load OpenGL function pointers.
 //  Helper libraries are often used for this purpose! Here we are supporting a few common ones (gl3w, glew, glad).
@@ -29,8 +27,17 @@ using namespace gl;
 #include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
 #endif
 
+// Include glfw3.h after our OpenGL definitions
+#include <GLFW/glfw3.h>
+
+// [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
+// To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
+// Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
+#if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
+#pragma comment(lib, "legacy_stdio_definitions")
+#endif
+
 #include <filesystem>
-#include <iostream>
 
 using std::filesystem::path;
 
@@ -68,7 +75,7 @@ static std::shared_ptr<Texture> loadTextureFromFile(const char* filename)
 
 static path assetPathRoot()
 {
-    return (std::filesystem::current_path().parent_path() / "assets").lexically_normal();
+    return (std::filesystem::current_path().parent_path().parent_path() / "assets").lexically_normal();
 }
 
 static path absToAssetPath(const path& absPath)
@@ -91,7 +98,7 @@ std::shared_ptr<Texture> AssetMan::textureFromAbsPath(const std::filesystem::pat
     auto it = m_pathTexMap.find(absPath);
     if (it == m_pathTexMap.end())
     {
-        auto tex = loadTextureFromFile(absPath.c_str());
+        auto tex = loadTextureFromFile(absPath.u8string().c_str());
         if (!tex)
         {
             throw std::runtime_error("Could not load texture file: " + absPath.string());

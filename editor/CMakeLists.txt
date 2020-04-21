@@ -1,35 +1,27 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 project(mwgeditor)
 
 set(CMAKE_CXX_STANDARD 17)
-
-find_package(SDL2 REQUIRED COMPONENTS SDL2::SDL2)
-
-include_directories(libs/imgui)
-include_directories(libs/imgui/examples)
-include_directories(libs/imgui/misc/cpp)
-include_directories(libs/imgui/misc/freetype)
-include_directories(libs/imgui/misc/single_file)
-include_directories(libs/stb)
-include_directories(libs/json)
-include_directories(libs/imfilebrowser)
-include_directories(libs/imgui/examples/libs/gl3w)
-include_directories(${SDL2_INCLUDE_DIRS})
-#include_directories(/usr/include/SDL2) # Probably only works on Linux, TODO fix
-
-add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
+add_subdirectory(lib/glfw-3.3.2)
+find_package(OpenGL REQUIRED)
+include_directories(src lib/imgui lib/imgui/examples lib/glad/include lib/json lib/stb lib/imfilebrowser)
+add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 add_executable(mwgeditor
         src/main.cpp
-        libs/imgui/examples/imgui_impl_opengl3.cpp
-        libs/imgui/examples/libs/gl3w/GL/gl3w.c
-        libs/imgui/examples/imgui_impl_opengl3.cpp
-        libs/imgui/examples/imgui_impl_sdl.cpp
-        libs/imgui/misc/cpp/imgui_stdlib.cpp
-        libs/imgui/imgui.cpp
-        libs/imgui/imgui_demo.cpp
-        libs/imgui/imgui_draw.cpp
-        libs/imgui/imgui_widgets.cpp
-        libs/imgui/imstb_truetype.h src/editor.cpp src/editor.h libs/stb/stb_image.h src/assetman.cpp src/assetman.h src/levelmodel.h src/loadjson.cpp src/loadjson.h src/savejson.cpp src/savejson.h src/util.cpp src/util.h libs/imfilebrowser/imfilebrowser.h src/visualizer.cpp src/visualizer.h src/global.cpp src/global.h src/vizmodel.h)
+        src/assetman.cpp
+        src/editor.cpp
+        src/global.cpp
+        src/loadjson.cpp
+        src/savejson.cpp
+        src/util.cpp
+        src/visualizer.cpp
+        lib/imgui/imgui.cpp
+        lib/imgui/imgui_draw.cpp
+        lib/imgui/imgui_widgets.cpp
+        lib/imgui/imgui_demo.cpp
+        lib/imgui/examples/imgui_impl_opengl3.cpp
+        lib/imgui/examples/imgui_impl_glfw.cpp
+        lib/glad/src/glad.c)
 
-target_link_libraries(mwgeditor SDL2::SDL2)
+target_link_libraries(mwgeditor glfw ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES})
