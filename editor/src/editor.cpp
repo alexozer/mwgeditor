@@ -213,8 +213,6 @@ static void showLevelProperties()
         g_level->customer = customer;
         g_selectedObj = customer;
     }
-
-    ImGui::Checkbox("Show gravity ranges", &g_showGravRanges);
 }
 
 static void showPropertiesEditor()

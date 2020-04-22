@@ -183,6 +183,16 @@ void showLevelObjectSelection(ImDrawList *drawList)
     }
 }
 
+void showVizOptions()
+{
+    ImGui::Checkbox("Show gravity ranges", &g_showGravRanges);
+
+    ImGui::SameLine();
+    float zoom = g_viz.getZoom();
+    ImGui::SliderFloat("Zoom", &zoom, 0.1, 2);
+    g_viz.setZoom(zoom);
+}
+
 void showLevelVisualizer()
 {
     // Set a default size for this window for first run, in case we have no .ini
@@ -198,10 +208,15 @@ void showLevelVisualizer()
         return;
     }
 
+    showVizOptions();
+
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     g_viz.generateWindowCanvas();
     ImGui::InvisibleButton("canvas", g_viz.getCanvas().size); // Used to detect clicks inside window
+
+    // Confine visualizer drawing to region below control option widgets
+    drawList->PushClipRect(g_viz.getCanvas().start, g_viz.getCanvas().end);
 
     handleDraggingObject();
     handleDraggingSpace();

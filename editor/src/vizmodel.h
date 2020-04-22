@@ -65,10 +65,12 @@ public:
 
     const Canvas& getCanvas() const { return m_canvas; }
 
+    float getZoom() const { return m_zoom; }
+    void setZoom(float zoom) { m_zoom = zoom; }
+
 private:
     float m_zoom;
     ImVec2 m_worldPos; // Position of "camera" in world space
     Canvas m_canvas;
-
 };
 
