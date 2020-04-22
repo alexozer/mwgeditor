@@ -114,10 +114,10 @@ static void handleScrollWheel()
 {
     if (ImGui::IsItemHovered())
     {
-        float currLog = std::logf(g_viz.getZoom());
+        float currLog = std::log(g_viz.getZoom());
 
         float scrollDelta = ImGui::GetIO().MouseWheel;
-        float newZoom = std::expf(currLog + scrollDelta * 0.2);
+        float newZoom = std::exp(currLog + scrollDelta * 0.2);
 
         newZoom = std::fmax(std::fmin(newZoom, MAX_ZOOM), MIN_ZOOM);
 
@@ -207,9 +207,9 @@ void showVizOptions()
     ImGui::Checkbox("Show gravity ranges", &g_showGravRanges);
 
     ImGui::SameLine();
-    float zoomLog = std::logf(g_viz.getZoom());
-    ImGui::SliderFloat("Zoom", &zoomLog, std::logf(MIN_ZOOM), std::logf(MAX_ZOOM));
-    g_viz.setZoom(std::expf(zoomLog));
+    float zoomLog = std::log(g_viz.getZoom());
+    ImGui::SliderFloat("Zoom", &zoomLog, std::log(MIN_ZOOM), std::log(MAX_ZOOM));
+    g_viz.setZoom(std::exp(zoomLog));
 }
 
 void showLevelVisualizer()

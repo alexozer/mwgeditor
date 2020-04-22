@@ -38,6 +38,7 @@ using namespace gl;
 #endif
 
 #include <filesystem>
+#include <algorithm>
 
 namespace fs = std::filesystem;
 

@@ -4,6 +4,7 @@
 #include "imgui.h"
 
 #include <vector>
+#include <algorithm>
 
 void showRecipeEditor()
 {
