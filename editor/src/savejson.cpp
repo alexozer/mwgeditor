@@ -35,6 +35,9 @@ static json genVecJson(ImVec2 vec)
 
 static json genObjectJson(const std::shared_ptr<ObjectModel>& obj)
 {
+    ImVec2 pos(obj->pos);
+    pos.y = -pos.y; // Flip Y coordinate (little hacky but w/e)
+
     return {
         {"type", "Animation"},
         {"data", {
@@ -43,7 +46,7 @@ static json genObjectJson(const std::shared_ptr<ObjectModel>& obj)
                  {"span", obj->span},
                  {"frame", 0},
                  {"scale", obj->scale},
-                 {"position", genVecJson(obj->pos)},
+                 {"position", genVecJson(pos)},
                  {"anchor", genVecJson(obj->anchor)},
              }
         }

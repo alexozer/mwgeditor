@@ -48,6 +48,8 @@ void loadObjectModel(const json& objectJson, std::shared_ptr<ObjectModel> object
     objectModel->anchor = loadJsonCoord(objectJson["data"]["anchor"]);
     objectModel->scale = loadJsonCoord(objectJson["data"]["scale"]).x;
 
+    objectModel->pos.y = -objectModel->pos.y; // Flip Y coordinate (little hacky but w/e)
+
     objectModel->cols = 1;
     auto colsIter = objectJson["data"].find("cols");
     if (colsIter != objectJson["data"].end())

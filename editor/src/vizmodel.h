@@ -63,7 +63,7 @@ public:
 
     void setWorldPos(ImVec2 worldPos) { m_worldPos = worldPos; }
 
-    const Canvas &getCanvas() const { return m_canvas; }
+    const Canvas& getCanvas() const { return m_canvas; }
 
 private:
     float m_zoom;
