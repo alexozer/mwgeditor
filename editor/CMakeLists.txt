@@ -22,6 +22,6 @@ add_executable(mwgeditor
         lib/imgui/imgui_demo.cpp
         lib/imgui/examples/imgui_impl_opengl3.cpp
         lib/imgui/examples/imgui_impl_glfw.cpp
-        lib/glad/src/glad.c)
+        lib/glad/src/glad.c src/recipeeditor.cpp src/recipeeditor.h)
 
 target_link_libraries(mwgeditor glfw ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES})
