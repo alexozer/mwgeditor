@@ -8,6 +8,8 @@
 #include "imgui.h"
 #include "imfilebrowser.h"
 
+namespace fs = std::filesystem;
+
 static ImGui::FileBrowser s_fileDialog;
 
 const static ImVec4 FAKE_HEADER_COLOR(0.4f, 0.4f, 1.0f, 1.0f);
@@ -65,32 +67,49 @@ static void showJsonFileState()
         ImGui::TextColored(FAKE_HEADER_COLOR, "No JSON file loaded");
     }
 
-    std::string levelJsonPath = getFileSelection("Open", "Open JSON Level", "../assets/json");
+    static std::string openErrorMsg;
+
+    std::filesystem::path defaultJsonPath = std::filesystem::current_path().parent_path().parent_path() / "assets" / "json";
+    std::string levelJsonPath = getFileSelection("Open", "Open JSON Level", defaultJsonPath);
     if (levelJsonPath.size() != 0)
     {
-        openLevelJson(levelJsonPath);
+        try
+        {
+            openLevelJson(levelJsonPath);
+        } catch (const std::exception& ex)
+        {
+            openErrorMsg = ex.what();
+            ImGui::OpenPopup("Cannot open level");
+        }
     }
 
-    static std::string validateMsg;
+    if (ImGui::BeginPopupModal("Cannot open level"))
+    {
+        ImGui::Text("Cannot open level: %s", openErrorMsg.c_str());
+        if (ImGui::Button("Ok")) ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+
+    static std::string saveErrorMsg;
 
     if (g_level)
     {
         ImGui::SameLine();
         if (ImGui::Button("Save"))
         {
-            validateMsg = validateLevelForExport();
-            if (!validateMsg.empty())
-            {
-                ImGui::OpenPopup("Cannot save level");
-            } else
+            try
             {
                 saveJsonLevel(g_jsonFilename, g_level);
+            } catch (const std::exception& ex)
+            {
+                ImGui::OpenPopup("Cannot save level");
+                saveErrorMsg = ex.what();
             }
         }
 
         if (ImGui::BeginPopupModal("Cannot save level"))
         {
-            ImGui::Text("Cannot save level: %s", validateMsg.c_str());
+            ImGui::Text("Cannot save level: %s", saveErrorMsg.c_str());
             if (ImGui::Button("Ok")) ImGui::CloseCurrentPopup();
             ImGui::EndPopup();
         }
@@ -122,15 +141,14 @@ static void showLevelProperties()
 
     ImGui::InputInt("Level number", &g_level->levelNumber);
 
-    std::filesystem::path texDirPath = std::filesystem::current_path().parent_path() / "assets" / "textures";
-    texDirPath = texDirPath.lexically_normal();
+    fs::path texDirPath = AssetMan::getAssetPathRoot() / "textures";
 
     // Add planet button
-    std::string texPath = getFileSelection("Add planet", "Select planet texture", texDirPath);
+    std::filesystem::path texPath = getFileSelection("Add planet", "Select planet texture", texDirPath);
     if (!texPath.empty())
     {
         auto planet = std::make_shared<PlanetModel>();
-        planet->tex = g_assetMan.textureFromAbsPath(texPath);
+        planet->tex = g_assetMan.loadTexture(texPath);
         planet->pos = g_viz.getWorldPos();
         planet->anchor = ImVec2(0.5, 0.5);
         planet->scale = 0.5;
@@ -150,7 +168,7 @@ static void showLevelProperties()
     if (!texPath.empty())
     {
         auto food = std::make_shared<FoodModel>();
-        food->tex = g_assetMan.textureFromAbsPath(texPath);
+        food->tex = g_assetMan.loadTexture(texPath);
         food->pos = g_viz.getWorldPos();
         food->anchor = ImVec2(0.5, 0.5);
         food->scale = 0.5;
@@ -168,7 +186,7 @@ static void showLevelProperties()
     if (!texPath.empty())
     {
         auto player = std::make_shared<ObjectModel>();
-        player->tex = g_assetMan.textureFromAbsPath(texPath);
+        player->tex = g_assetMan.loadTexture(texPath);
         player->pos = g_viz.getWorldPos();
         player->anchor = ImVec2(0.5, 0.5);
         player->scale = 0.5;
@@ -184,7 +202,7 @@ static void showLevelProperties()
     if (!texPath.empty())
     {
         auto customer = std::make_shared<ObjectModel>();
-        customer->tex = g_assetMan.textureFromAbsPath(texPath);
+        customer->tex = g_assetMan.loadTexture(texPath);
         customer->pos = g_viz.getWorldPos();
         customer->anchor = ImVec2(0.5, 0.5);
         customer->scale = 0.5;
@@ -215,8 +233,6 @@ static void showPropertiesEditor()
         ImGui::End();
         return;
     }
-
-    ImGui::Text("Texture filepath: %s", g_assetMan.assetPathFromTexture(g_selectedObj->tex).c_str());
 
     // Is casting like this bad?
     ImGui::InputFloat2("Position", reinterpret_cast<float *>(&g_selectedObj->pos), "%.3f");
@@ -307,7 +323,7 @@ static void showRecipeEditor()
 
     for (auto& food : g_level->foods)
     {
-        std::string basicName = g_assetMan.assetPathFromTexture(food->tex).filename().u8string();
+        std::string basicName = food->tex->filePath.filename().u8string();
         foodNames.push_back(basicName);
     }
     for (auto& name : foodNames)
@@ -352,7 +368,7 @@ static void showRecipeEditor()
 
 void initEditor()
 {
-    g_gravRangeTex = g_assetMan.textureFromAssetPath(std::filesystem::path("textures") / "range.png");
+    g_gravRangeTex = g_assetMan.loadTexture(g_assetMan.getAssetPathRoot() / "textures" / "range.png", "range");
     g_showGravRanges = true;
     s_fileDialog.SetTitle("Select file");
 }

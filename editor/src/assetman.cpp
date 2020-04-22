@@ -39,7 +39,7 @@ using namespace gl;
 
 #include <filesystem>
 
-using std::filesystem::path;
+namespace fs = std::filesystem;
 
 // Simple helper function to load an image into a OpenGL texture with common settings
 static std::shared_ptr<Texture> loadTextureFromFile(const char* filename)
@@ -73,46 +73,50 @@ static std::shared_ptr<Texture> loadTextureFromFile(const char* filename)
     return outTexture;
 }
 
-static path assetPathRoot()
+fs::path AssetMan::getAssetPathRoot()
 {
     return (std::filesystem::current_path().parent_path().parent_path() / "assets").lexically_normal();
 }
 
-static path absToAssetPath(const path& absPath)
+std::shared_ptr<Texture> AssetMan::loadTexture(const std::filesystem::path &absPath, const std::string& shortName)
 {
-    return absPath.lexically_relative(assetPathRoot());
-}
-
-static path assetToAbsPath(const path& assetPath)
-{
-    return assetPathRoot() / assetPath;
-}
-
-std::shared_ptr<Texture> AssetMan::textureFromAssetPath(const std::filesystem::path &path)
-{
-    return textureFromAbsPath(assetToAbsPath(path));
-}
-
-std::shared_ptr<Texture> AssetMan::textureFromAbsPath(const std::filesystem::path &absPath)
-{
-    auto it = m_pathTexMap.find(absPath);
-    if (it == m_pathTexMap.end())
+    auto it = std::find_if(m_textures.begin(), m_textures.end(), [&](auto tex) {
+        return tex->filePath == absPath;
+    });
+    if (it == m_textures.end())
     {
         auto tex = loadTextureFromFile(absPath.u8string().c_str());
         if (!tex)
         {
             throw std::runtime_error("Could not load texture file: " + absPath.string());
         }
-        m_pathTexMap[absPath] = tex;
-        m_texPathMap[tex] = absPath;
+
+        tex->filePath = absPath;
+        tex->shortName = shortName.empty() ? absPath.filename().u8string() : shortName;
+        m_textures.push_back(tex);
 
         return tex;
     }
 
-    return it->second;
+    return *it;
 }
 
-std::filesystem::path AssetMan::assetPathFromTexture(const std::shared_ptr<Texture> &texture)
+std::shared_ptr<Texture> AssetMan::findTextureByShortName(const std::string& shortName)
 {
-    return m_texPathMap.at(texture);
+    auto it = std::find_if(m_textures.begin(), m_textures.end(), [&](auto tex) {
+        return tex->shortName == shortName;
+    });
+
+    return it != m_textures.end() ? *it : nullptr;
+}
+
+const std::vector<std::shared_ptr<Texture>>& AssetMan::getTextures()
+{
+    return m_textures;
+}
+
+std::string AssetMan::getAssetPathStr(const fs::path &path)
+{
+    fs::path relative = path.lexically_relative(getAssetPathRoot());
+    return relative.generic_u8string();
 }
