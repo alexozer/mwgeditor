@@ -25,12 +25,12 @@ public:
 
     ImVec2 vizToWorldSpace(ImVec2 vizPos) const
     {
-        return ImVec2(vizPos.x + m_worldPos.x, vizPos.y + m_worldPos.y);
+        return ImVec2(vizPos.x / m_zoom + m_worldPos.x, vizPos.y / m_zoom + m_worldPos.y);
     }
 
     ImVec2 worldToVizSpace(ImVec2 worldPos) const
     {
-        return ImVec2(worldPos.x - m_worldPos.x, worldPos.y - m_worldPos.y);
+        return ImVec2((worldPos.x - m_worldPos.x) * m_zoom, (worldPos.y - m_worldPos.y) * m_zoom);
     }
 
     ImVec2 vizToScreenSpace(ImVec2 vizPos) const

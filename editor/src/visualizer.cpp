@@ -6,6 +6,10 @@
 #include "global.h"
 
 #include <memory>
+#include <cmath>
+
+constexpr float MIN_ZOOM = 0.1;
+constexpr float MAX_ZOOM = 1.5;
 
 static void showLevelObject(ImDrawList *drawList, const std::shared_ptr<ObjectModel>& object)
 {
@@ -106,6 +110,21 @@ static std::shared_ptr<ObjectModel> findObjectAtScreenPos(ImVec2 pos)
     return nullptr;
 }
 
+static void handleScrollWheel()
+{
+    if (ImGui::IsItemHovered())
+    {
+        float currLog = std::logf(g_viz.getZoom());
+
+        float scrollDelta = ImGui::GetIO().MouseWheel;
+        float newZoom = std::expf(currLog + scrollDelta * 0.2);
+
+        newZoom = std::fmax(std::fmin(newZoom, MAX_ZOOM), MIN_ZOOM);
+
+        g_viz.setZoom(newZoom);
+    }
+}
+
 static void handleDraggingObject()
 {
     // TODO dedup with handleDraggingSpace()?
@@ -129,8 +148,8 @@ static void handleDraggingObject()
     }
     if (isDraggingObj)
     {
-        g_selectedObj->pos = ImVec2(oldWorldPos.x + currMousePos.x - mouseDownPos.x,
-                                  oldWorldPos.y + currMousePos.y - mouseDownPos.y);
+        g_selectedObj->pos = ImVec2(oldWorldPos.x + (currMousePos.x - mouseDownPos.x) / g_viz.getZoom(),
+                                  oldWorldPos.y + (currMousePos.y - mouseDownPos.y) / g_viz.getZoom());
         if (!ImGui::IsMouseDown(0)) isDraggingObj = false;
     }
 }
@@ -151,8 +170,8 @@ static void handleDraggingSpace()
     }
     if (isDraggingSpace)
     {
-        g_viz.setWorldPos(ImVec2(oldVizWorldPos.x + mouseDownScreenPos.x - currMouseScreenPos.x,
-                               oldVizWorldPos.y + mouseDownScreenPos.y - currMouseScreenPos.y));
+        g_viz.setWorldPos(ImVec2(oldVizWorldPos.x + (mouseDownScreenPos.x - currMouseScreenPos.x) / g_viz.getZoom(),
+                               oldVizWorldPos.y + (mouseDownScreenPos.y - currMouseScreenPos.y) / g_viz.getZoom()));
         if (!ImGui::IsMouseDown(0)) isDraggingSpace = false;
     }
 }
@@ -188,9 +207,9 @@ void showVizOptions()
     ImGui::Checkbox("Show gravity ranges", &g_showGravRanges);
 
     ImGui::SameLine();
-    float zoom = g_viz.getZoom();
-    ImGui::SliderFloat("Zoom", &zoom, 0.1, 2);
-    g_viz.setZoom(zoom);
+    float zoomLog = std::logf(g_viz.getZoom());
+    ImGui::SliderFloat("Zoom", &zoomLog, std::logf(MIN_ZOOM), std::logf(MAX_ZOOM));
+    g_viz.setZoom(std::expf(zoomLog));
 }
 
 void showLevelVisualizer()
@@ -218,6 +237,7 @@ void showLevelVisualizer()
     // Confine visualizer drawing to region below control option widgets
     drawList->PushClipRect(g_viz.getCanvas().start, g_viz.getCanvas().end);
 
+    handleScrollWheel();
     handleDraggingObject();
     handleDraggingSpace();
     showLevelGrid(drawList);
