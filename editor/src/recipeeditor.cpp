@@ -20,7 +20,7 @@ void showRecipeEditor()
 
     for (auto& food : g_level->foods)
     {
-        std::string basicName = food->tex->filePath.filename().u8string();
+        std::string basicName = food->tex->shortName;
         foodNames.push_back(basicName);
     }
     for (auto& name : foodNames)
