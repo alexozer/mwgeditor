@@ -4,6 +4,8 @@ The level editor can be built on Windows, macOS, and Linux.
 
 ## macOS and Linux
 
+For macOS, the editor requires at least macOS Catalina to build.
+
 Create a build directory (you only need to do this once):
 
 ```
