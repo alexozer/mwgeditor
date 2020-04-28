@@ -151,5 +151,9 @@ std::shared_ptr<LevelModel> loadJsonLevel(const std::string& filename)
     levelModel->customer = std::make_shared<ObjectModel>();
     loadObjectModel(customerJson, levelModel->customer);
 
+    // Load level timer
+    auto& timerJson = levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["timer"]["data"]["timer"];
+    levelModel->levelTimer = timerJson.get<float>();
+
     return levelModel;
 }

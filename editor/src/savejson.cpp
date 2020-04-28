@@ -167,6 +167,10 @@ void saveJsonLevel(const std::string &filename, const std::shared_ptr<LevelModel
 
     saveAssetsJson();
 
+    // Save level timer
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["timer"]["type"] = "Node";
+    levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["timer"]["data"]["timer"] = level->levelTimer;
+
     // Add planets and foods
     auto planetJsonPair = genPlanetsJson(level);
     levelJson["scenes"][levelNumStr]["children"]["game"]["children"]["planets"] = planetJsonPair.first;

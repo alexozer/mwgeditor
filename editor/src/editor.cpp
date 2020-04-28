@@ -141,6 +141,7 @@ static void showLevelProperties()
     }
 
     ImGui::InputInt("Level number", &g_level->levelNumber);
+    ImGui::InputFloat("Level timer", &g_level->levelTimer);
 
     fs::path texDirPath = AssetMan::getAssetPathRoot() / "textures";
 

@@ -51,6 +51,7 @@ struct FoodModel : public ObjectModel
 
 struct LevelModel {
     int levelNumber;
+    float levelTimer;
 
     std::vector<std::shared_ptr<PlanetModel>> planets;
 
