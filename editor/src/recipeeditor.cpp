@@ -10,7 +10,7 @@ void showRecipeEditor()
 {
     ImGui::SetNextWindowSize(ImVec2(400, 600), ImGuiCond_FirstUseEver);
     ImGui::Begin("Recipe Editor");
-    if (!g_level)
+    if (!g_level || g_level->foods.size() == 0)
     {
         ImGui::End();
         return;
