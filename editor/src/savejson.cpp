@@ -1,5 +1,4 @@
 #include "savejson.h"
-#include "util.h"
 #include "global.h"
 
 #include "json.hpp"
@@ -141,7 +140,7 @@ static json genFoodsJson(const std::shared_ptr<LevelModel>& level)
 
 void saveAssetsJson()
 {
-    fs::path assetsJsonPath = AssetMan::getAssetPathRoot() / "json" / "assets_demo.json";
+    fs::path assetsJsonPath = g_assetMan.getAssetPathRoot() / "json" / "assets_demo.json";
     std::ifstream fin(assetsJsonPath);
     json assetsJson;
     fin >> assetsJson;
@@ -149,7 +148,7 @@ void saveAssetsJson()
 
     for (auto& tex : g_assetMan.getTextures())
     {
-        texturesJson[tex->shortName]["file"] = AssetMan::getAssetPathStr(tex->filePath);
+        texturesJson[tex->shortName]["file"] = g_assetMan.getAssetPathStr(tex->filePath);
     }
 
     std::ofstream fout(assetsJsonPath);

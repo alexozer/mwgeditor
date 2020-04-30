@@ -42,6 +42,22 @@ using namespace gl;
 
 namespace fs = std::filesystem;
 
+void AssetMan::init()
+{
+    fs::path currPath = fs::current_path();
+
+    while (!fs::exists(currPath / ".git"))
+    {
+        currPath = currPath.parent_path();
+        if (currPath.root_path() == currPath)
+        {
+            throw std::runtime_error("Could not locate Milky Way Gourmet git repository root dir");
+        }
+    }
+
+    m_assetPathRoot = currPath / "assets";
+}
+
 // Simple helper function to load an image into a OpenGL texture with common settings
 static std::shared_ptr<Texture> loadTextureFromFile(const char* filename)
 {
@@ -76,7 +92,7 @@ static std::shared_ptr<Texture> loadTextureFromFile(const char* filename)
 
 fs::path AssetMan::getAssetPathRoot()
 {
-    return (std::filesystem::current_path().parent_path().parent_path() / "assets").lexically_normal();
+    return m_assetPathRoot;
 }
 
 std::shared_ptr<Texture> AssetMan::loadTexture(const std::filesystem::path &absPath, const std::string& shortName)

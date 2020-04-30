@@ -11,7 +11,7 @@ namespace fs = std::filesystem;
 
 void loadJsonAssets()
 {
-    std::ifstream f(AssetMan::getAssetPathRoot() / "json" / "assets_demo.json");
+    std::ifstream f(g_assetMan.getAssetPathRoot() / "json" / "assets_demo.json");
     json assetsJson;
     f >> assetsJson;
 
@@ -20,7 +20,7 @@ void loadJsonAssets()
         const std::string& name = texJsonItem.key();
         if (!g_assetMan.findTextureByShortName(name))
         {
-            fs::path texPath = AssetMan::getAssetPathRoot() / texJsonItem.value()["file"].get<std::string>();
+            fs::path texPath = g_assetMan.getAssetPathRoot() / texJsonItem.value()["file"].get<std::string>();
             texPath.make_preferred();
             g_assetMan.loadTexture(texPath, name);
         }

@@ -70,7 +70,7 @@ static void showJsonFileState()
 
     static std::string openErrorMsg;
 
-    std::filesystem::path defaultJsonPath = std::filesystem::current_path().parent_path().parent_path() / "assets" / "json";
+    std::filesystem::path defaultJsonPath = g_assetMan.getAssetPathRoot() / "json";
     std::string levelJsonPath = getFileSelection("Open", "Open JSON Level", defaultJsonPath);
     if (levelJsonPath.size() != 0)
     {
@@ -143,7 +143,7 @@ static void showLevelProperties()
     ImGui::InputInt("Level number", &g_level->levelNumber);
     ImGui::InputFloat("Level timer", &g_level->levelTimer);
 
-    fs::path texDirPath = AssetMan::getAssetPathRoot() / "textures";
+    fs::path texDirPath = g_assetMan.getAssetPathRoot() / "textures";
 
     // Add planet button
     std::filesystem::path texPath = getFileSelection("Add planet", "Select planet texture", texDirPath);
@@ -310,6 +310,7 @@ static void showPropertiesEditor()
 
 void initEditor()
 {
+    g_assetMan.init();
     g_gravRangeTex = g_assetMan.loadTexture(g_assetMan.getAssetPathRoot() / "textures" / "range.png", "range");
     g_showGravRanges = true;
     s_fileDialog.SetTitle("Select file");
