@@ -10,7 +10,7 @@ using json = nlohmann::json;
 namespace fs = std::filesystem;
 
 template <typename T>
-T getJsonDefault(const json& j, const std::string& key, T def)
+static T getJsonDefault(const json& j, const std::string& key, T def)
 {
     auto it = j.find(key);
     if (it != j.end()) {
@@ -60,19 +60,8 @@ void loadObjectModel(const json& objectJson, std::shared_ptr<ObjectModel> object
 
     objectModel->pos.y = -objectModel->pos.y; // Flip Y coordinate (little hacky but w/e)
 
-    objectModel->cols = 1;
-    auto colsIter = objectJson["data"].find("cols");
-    if (colsIter != objectJson["data"].end())
-    {
-        objectModel->cols = colsIter->get<int>();
-    }
-
-    objectModel->span = objectModel->cols;
-    auto spanIter = objectJson["data"].find("span");
-    if (spanIter != objectJson["data"].end())
-    {
-        objectModel->span = spanIter->get<int>();
-    }
+    objectModel->cols = getJsonDefault(objectJson["data"], "cols", 1);
+    objectModel->span = getJsonDefault(objectJson["data"], "span", objectModel->cols);
 }
 
 std::shared_ptr<PlanetModel> loadJsonPlanet(const json& planetJson)
@@ -81,17 +70,12 @@ std::shared_ptr<PlanetModel> loadJsonPlanet(const json& planetJson)
 
     loadObjectModel(planetJson, planetModel);
 
-    auto sunIt = planetJson["data"].find("isSun");
-    auto blackHoleIt = planetJson["data"].find("isBlackHole");
-    auto storageIt = planetJson["data"].find("isStorage");
-    auto hasFoodIt = planetJson["data"].find("hasFood");
-    auto seasonIt = planetJson["data"].find("isSeasonPlanet");
+    planetModel->hasFood = getJsonDefault(planetJson["data"], "hasFood", false);
 
-    bool isSun = sunIt != planetJson["data"].end() && sunIt->get<bool>();
-    bool isBlackHole = blackHoleIt != planetJson["data"].end() && blackHoleIt->get<bool>();
-    bool isStorage = storageIt != planetJson["data"].end() && storageIt->get<bool>();
-    bool hasFood = hasFoodIt != planetJson["data"].end() && hasFoodIt->get<bool>();
-    bool isSeason = seasonIt != planetJson["data"].end() && seasonIt->get<bool>();
+    bool isSun = getJsonDefault(planetJson["data"], "isSun", false);
+    bool isBlackHole = getJsonDefault(planetJson["data"], "isBlackHole", false);
+    bool isStorage = getJsonDefault(planetJson["data"], "isStorage", false);
+    bool isSeason = getJsonDefault(planetJson["data"], "isSeasonPlanet", false);
 
     if (isSun) planetModel->type = PlanetType::SUN;
     else if (isBlackHole) planetModel->type = PlanetType::BLACKHOLE;
