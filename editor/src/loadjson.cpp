@@ -9,6 +9,16 @@
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
+template <typename T>
+T getJsonDefault(const json& j, const std::string& key, T def)
+{
+    auto it = j.find(key);
+    if (it != j.end()) {
+        return it->get<T>();
+    }
+    return def;
+}
+
 void loadJsonAssets()
 {
     std::ifstream f(g_assetMan.getAssetPathRoot() / "json" / "assets.json");
@@ -98,7 +108,8 @@ std::shared_ptr<FoodModel> loadJsonFood(const json& foodJson)
 
     loadObjectModel(foodJson, foodModel);
 
-    foodModel->cookable = foodJson["data"]["cookable"].get<bool>();
+    foodModel->cookable = getJsonDefault(foodJson["data"], "cookable", false);
+    foodModel->seasonable = getJsonDefault(foodJson["data"], "seasonable", false);
 
     return foodModel;
 }

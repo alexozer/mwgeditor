@@ -47,6 +47,7 @@ struct PlanetModel : public ObjectModel
 struct FoodModel : public ObjectModel
 {
     bool cookable;
+    bool seasonable;
 };
 
 struct LevelModel {

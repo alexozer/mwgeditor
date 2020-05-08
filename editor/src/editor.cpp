@@ -177,6 +177,7 @@ static void showLevelProperties()
         food->cols = 1;
         food->span = 1;
         food->cookable = false;
+        food->seasonable = false;
 
         g_level->foods.emplace_back(food);
         g_selectedObj = food;
@@ -295,6 +296,7 @@ static void showPropertiesEditor()
     {
         ImGui::TextColored(FAKE_HEADER_COLOR, "Food Properties");
         ImGui::Checkbox("Cookable", &selectedFood->cookable);
+        ImGui::Checkbox("Seasonable", &selectedFood->seasonable);
     }
 
     if (g_selectedObj == g_level->player)

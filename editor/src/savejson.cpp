@@ -131,6 +131,7 @@ static json genFoodsJson(const std::shared_ptr<LevelModel>& level)
         auto& food = level->foods[foodIdx];
         json foodJson = genObjectJson(food);
         foodJson["data"]["cookable"] = food->cookable;
+        foodJson["data"]["seasonable"] = food->seasonable;
 
         std::string foodName = "food" + std::to_string(foodIdx + 1);
         foodListJson["children"][foodName] = foodJson;
