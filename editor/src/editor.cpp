@@ -282,6 +282,8 @@ static void showPropertiesEditor()
         ImGui::RadioButton("Blackhole", &type, 2);
         ImGui::SameLine();
         ImGui::RadioButton("Storage", &type, 3);
+        ImGui::SameLine();
+        ImGui::RadioButton("Season", &type, 4);
         selectedPlanet->type = static_cast<PlanetType>(type);
 
         ImGui::Checkbox("Has food", &selectedPlanet->hasFood);

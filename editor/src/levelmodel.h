@@ -7,7 +7,7 @@
 #include <memory>
 
 enum class PlanetOrder { START, MIDDLE, END };
-enum class PlanetType { NORMAL, SUN, BLACKHOLE, STORAGE };
+enum class PlanetType { NORMAL, SUN, BLACKHOLE, STORAGE, SEASON };
 
 struct ObjectModel
 {

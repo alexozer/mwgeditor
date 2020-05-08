@@ -11,7 +11,7 @@ namespace fs = std::filesystem;
 
 void loadJsonAssets()
 {
-    std::ifstream f(g_assetMan.getAssetPathRoot() / "json" / "assets_demo.json");
+    std::ifstream f(g_assetMan.getAssetPathRoot() / "json" / "assets.json");
     json assetsJson;
     f >> assetsJson;
 
@@ -75,15 +75,18 @@ std::shared_ptr<PlanetModel> loadJsonPlanet(const json& planetJson)
     auto blackHoleIt = planetJson["data"].find("isBlackHole");
     auto storageIt = planetJson["data"].find("isStorage");
     auto hasFoodIt = planetJson["data"].find("hasFood");
+    auto seasonIt = planetJson["data"].find("isSeasonPlanet");
 
     bool isSun = sunIt != planetJson["data"].end() && sunIt->get<bool>();
     bool isBlackHole = blackHoleIt != planetJson["data"].end() && blackHoleIt->get<bool>();
     bool isStorage = storageIt != planetJson["data"].end() && storageIt->get<bool>();
     bool hasFood = hasFoodIt != planetJson["data"].end() && hasFoodIt->get<bool>();
+    bool isSeason = seasonIt != planetJson["data"].end() && seasonIt->get<bool>();
 
     if (isSun) planetModel->type = PlanetType::SUN;
     else if (isBlackHole) planetModel->type = PlanetType::BLACKHOLE;
     else if (isStorage) planetModel->type = PlanetType::STORAGE;
+    else if (isSeason) planetModel->type = PlanetType::SEASON;
     else planetModel->type = PlanetType::NORMAL;
 
     return planetModel;

@@ -59,6 +59,7 @@ static json genPlanetJson(const std::shared_ptr<PlanetModel>& planet)
     planetJson["data"]["isSun"] = planet->type == PlanetType::SUN;
     planetJson["data"]["isStorage"] = planet->type == PlanetType::STORAGE;
     planetJson["data"]["isBlackHole"] = planet->type == PlanetType::BLACKHOLE;
+    planetJson["data"]["isSeasonPlanet"] = planet->type == PlanetType::SEASON;
     return planetJson;
 }
 
@@ -140,7 +141,7 @@ static json genFoodsJson(const std::shared_ptr<LevelModel>& level)
 
 void saveAssetsJson()
 {
-    fs::path assetsJsonPath = g_assetMan.getAssetPathRoot() / "json" / "assets_demo.json";
+    fs::path assetsJsonPath = g_assetMan.getAssetPathRoot() / "json" / "assets.json";
     std::ifstream fin(assetsJsonPath);
     json assetsJson;
     fin >> assetsJson;
