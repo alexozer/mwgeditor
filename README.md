@@ -1,6 +1,10 @@
 # Milky Way Gourmet Level Editor
 
-The level editor can be built on Windows, macOS, and Linux.
+A level editor for Milky Way Gourmet, a space cooking game for mobile.
+
+![Screenshot](doc/screenshot.png)
+
+# Building
 
 ## macOS and Linux
 
