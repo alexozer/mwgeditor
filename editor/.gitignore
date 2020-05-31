@@ -1,7 +1,0 @@
-/mwgeditor
-*.o
-/cmake-build-debug/
-/imgui.ini
-/.idea/
-/*.d
-/build/
