@@ -4,6 +4,8 @@ A level editor for Milky Way Gourmet, a space cooking game for mobile.
 
 ![Screenshot](doc/screenshot.png)
 
+_Level above designed by Eric Rubenstein_
+
 # Building
 
 ## macOS and Linux
